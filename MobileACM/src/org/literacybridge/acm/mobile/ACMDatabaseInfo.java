@@ -43,8 +43,16 @@ public class ACMDatabaseInfo {
 	}
 	
 	public static class DeviceImage {
+		public static enum Status {
+			Downloading,
+			Downloaded,
+			NotAvailable
+		}
+		
 		private final String name;
 		private final String path;
+		private long sizeInBytes;
+		private Status status;
 		
 		public DeviceImage(String name, String path) {
 			this.name = name;
@@ -57,6 +65,14 @@ public class ACMDatabaseInfo {
 		
 		public String getPath() {
 			return path;
+		}
+		
+		public Status getStatus() {
+			return status;
+		}
+		
+		public long getSizeInBytes() {
+			return sizeInBytes;
 		}
 		
 		@Override
