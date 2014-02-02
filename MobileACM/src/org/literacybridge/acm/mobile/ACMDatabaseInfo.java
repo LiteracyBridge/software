@@ -24,7 +24,19 @@ public class ACMDatabaseInfo {
 	public List<ACMDatabaseInfo.DeviceImage> getDeviceImages() {
 		return Collections.unmodifiableList(deviceImages);
 	}
-			
+
+	public List<String> getDeviceImagesNames() {
+		
+		List<String> listNames = new ArrayList<String>();
+		for (DeviceImage img : deviceImages)
+		{
+			listNames.add(img.getName());
+		}
+		
+		return listNames;
+		
+	}
+	
 	@Override
 	public String toString() {
 		return name;

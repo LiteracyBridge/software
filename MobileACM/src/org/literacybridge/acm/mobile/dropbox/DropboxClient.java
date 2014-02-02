@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.literacybridge.acm.mobile.ACMDatabaseInfo;
 import org.literacybridge.acm.mobile.IOHandler;
+import org.literacybridge.acm.mobile.OnlineImages;
+
 
 import android.app.Activity;
 import android.content.Intent;
@@ -112,8 +114,16 @@ public class DropboxClient extends Activity {
         		Log.d("michael", db.getName());
         		for (ACMDatabaseInfo.DeviceImage image : db.getDeviceImages()) {
         			Log.d("michael", "\t" + image.getName() + "  ->  " + image.getPath());
+        			
         		}
         	}
+        	
+        	Intent intent = new Intent (this, OnlineImages.class);
+        
+        	startActivity(intent);
+        	
+            
+        	
         }
     }
 

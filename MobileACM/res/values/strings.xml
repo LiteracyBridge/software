@@ -4,5 +4,8 @@
     <string name="app_name">MobileACM</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hallo Simulator.</string>
+    <string name="title_activity_online_images">MobileACM</string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">Item Detail</string>
 
 </resources>

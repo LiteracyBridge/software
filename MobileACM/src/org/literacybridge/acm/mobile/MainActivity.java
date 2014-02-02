@@ -1,12 +1,9 @@
 package org.literacybridge.acm.mobile;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.literacybridge.acm.mobile.dropbox.DropboxClient;
-
-import org.literacybridge.acm.mobile.ExpandableListAdapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -24,6 +21,8 @@ public class MainActivity extends Activity {
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
+    List<ACMDatabaseInfo> deviceList;
+    
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,21 +31,20 @@ public class MainActivity extends Activity {
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build(); 
 		StrictMode.setThreadPolicy(policy);
 		setContentView(R.layout.activity_main);
-		
+
         // get the listview
-        expListView = (ExpandableListView) findViewById(R.id.lvExp);
-        
-        IOHandler DataHandler = new IOHandler(null);
-        listDataChild = DataHandler.getDatabaseInfoMap();
-        
+        //expListView = (ExpandableListView) findViewById(R.id.lvExp);
+		
+		/*
         listDataHeader = new ArrayList<String>();
         listDataHeader.addAll(listDataChild.keySet()); 
         
         
         listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+ 		*/
  
         // setting list adapter
-        expListView.setAdapter(listAdapter);
+        //expListView.setAdapter(listAdapter);
 		
 	}
 	
@@ -55,6 +53,16 @@ public class MainActivity extends Activity {
         super.onResume();
 		Intent intent = new Intent(this, DropboxClient.class);
 		startActivity(intent);
+				
+//        try {      
+//			IOHandler.getInstance().refresh();
+//			deviceList = IOHandler.getInstance().getDatabaseInfos();
+//        } catch (Exception e) {
+//        	Log.d("michael", "x", e);
+//        }
+//        
+//		Log.d("michael", "DeviceList Size=" + deviceList.size());
+
     }
 
 	@Override
