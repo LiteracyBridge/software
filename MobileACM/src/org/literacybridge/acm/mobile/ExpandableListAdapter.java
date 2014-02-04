@@ -1,5 +1,6 @@
 package org.literacybridge.acm.mobile;
  
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
  
@@ -9,20 +10,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
  
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
     private Context _context;
-    private List<String> _listDataHeader; // header titles
+    private List<String> _listDataHeader; // Database names
+    
     // child data in format of header title, child title
-    private HashMap<String, List<String>> _listDataChild;
+    private HashMap<String, List<String>> _listDataChild; // Device Image Names
+    
+    // downloadingState in format <
+    //private Dictionary<String, String> _dictDownloadingState; // 
  
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
-            HashMap<String, List<String>> listChildData) {
+            HashMap<String, List<String>> listChildData /*, Dictionary<String, String> dictState*/) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
+       // this._dictDownloadingState = dictState;
+        
     }
  
     
@@ -44,6 +52,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
         final String childText = (String) getChild(groupPosition, childPosition);
  
+        final String imageName = childText.split(",")[0];
+        final String StateName = childText.split(",")[1];
+        
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -52,8 +63,20 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
         TextView txtListChild = (TextView) convertView
                 .findViewById(R.id.lblListItem);
+        
+        // Add image
+        //ImageView imgListView = (ImageView) convertView
+        //		.findViewById(R.id.imgListItem);
+        
+
+        //imgListView.setImageResource(R.drawable.ic_launcher);
+        
+        TextView txtStatus = (TextView) convertView
+                .findViewById(R.id.lblStatus);
  
-        txtListChild.setText(childText);
+        txtListChild.setText(imageName);
+        txtStatus.setText(StateName);
+        
         return convertView;
     }
  

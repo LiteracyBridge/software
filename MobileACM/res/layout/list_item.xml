@@ -13,4 +13,21 @@
         android:paddingBottom="5dp"
         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" />
  
+    <TextView
+        android:id="@+id/lblStatus"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15dip"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft" />
+    
+    
+    <ImageView 
+    android:id="@+id/imgListItem"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"   
+    android:contentDescription="group image"/>
+    
+    
 </LinearLayout>
