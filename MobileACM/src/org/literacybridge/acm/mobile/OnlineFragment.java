@@ -56,7 +56,7 @@ public class OnlineFragment extends Fragment {
 			listDataHeader.add(deviceInf.getName());
 			
 			// Adding children
-			listDataChild.put(deviceInf.getName(), deviceInf.getDeviceImagesNamesAndStates());
+			listDataChild.put(deviceInf.getName(), deviceInf.getDeviceImagesNamesStatesAndSize());
 			
 			
 		}

@@ -37,12 +37,12 @@ public class ACMDatabaseInfo {
 		
 	}
 
-	public List<String> getDeviceImagesNamesAndStates() {
+	public List<String> getDeviceImagesNamesStatesAndSize() {
 		
 		List<String> listNames = new ArrayList<String>();
 		for (DeviceImage img : deviceImages)
 		{
-			listNames.add(img.getName() + "," + img.getStatus());
+			listNames.add(img.getName() + "," + img.getStatus() + "," + img.getSizeInBytes());
 		}
 		
 		return listNames;

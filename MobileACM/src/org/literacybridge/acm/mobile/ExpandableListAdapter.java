@@ -25,11 +25,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     //private Dictionary<String, String> _dictDownloadingState; // 
  
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
-            HashMap<String, List<String>> listChildData /*, Dictionary<String, String> dictState*/) {
+            HashMap<String, List<String>> listChildData) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
-       // this._dictDownloadingState = dictState;
         
     }
  
@@ -54,6 +53,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
         final String imageName = childText.split(",")[0];
         final String StateName = childText.split(",")[1];
+        final String SizeName = childText.split(",")[2];
         
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
@@ -74,8 +74,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         TextView txtStatus = (TextView) convertView
                 .findViewById(R.id.lblStatus);
  
+        TextView txtSize = (TextView) convertView
+                .findViewById(R.id.lblSize);
+        
         txtListChild.setText(imageName);
         txtStatus.setText(StateName);
+        txtSize.setText(SizeName);
         
         return convertView;
     }
