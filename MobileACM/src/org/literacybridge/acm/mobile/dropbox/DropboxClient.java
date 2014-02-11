@@ -8,10 +8,13 @@ import org.literacybridge.acm.mobile.OnlineImages;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -118,15 +121,18 @@ public class DropboxClient extends Activity {
         		}
         	}
         	
-        	Intent intent = new Intent (this, OnlineImages.class);
-        
-        	startActivity(intent);
         	
+    		Intent intent = new Intent (this, OnlineImages.class);
+        	
+        	// Start mobileACM activity
+        	startActivity(intent);
+
             
         	
         }
     }
 
+  
     private void logOut() {
         // Remove credentials from the session
         mApi.getSession().unlink();

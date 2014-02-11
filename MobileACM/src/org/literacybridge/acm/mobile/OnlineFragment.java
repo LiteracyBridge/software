@@ -5,6 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.literacybridge.acm.mobile.R;
+
+import android.app.ActivityManager;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -39,53 +44,68 @@ public class OnlineFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 	    super.onActivityCreated(savedInstanceState);
 	    
-	    deviceList = IOHandler.getInstance().getDatabaseInfos();
-		
-		Log.d("bruno", "Size = " + deviceList.get(0).getName());
-		
-		
-		// Set ExpandeableListView to activity
-		expListView = (ExpandableListView) getActivity().findViewById(R.id.expListView);
-		
-		
-		listDataHeader = new ArrayList<String>(); 
-		listDataChild = new HashMap<String, List<String>>();
-		for (ACMDatabaseInfo deviceInf : deviceList)
-		{
-			// Adding header
-			listDataHeader.add(deviceInf.getName());
+	    ConnectivityManager connMgr = (ConnectivityManager) getActivity()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+	    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+	    if (networkInfo != null && networkInfo.isConnected()) {
+
+	    	deviceList = IOHandler.getInstance().getDatabaseInfos();
+	    	Log.d("bruno", "Size = " + deviceList.get(0).getName());
 			
-			// Adding children
-			listDataChild.put(deviceInf.getName(), deviceInf.getDeviceImagesNamesStatesAndSize());
+	    	// Set ExpandeableListView to activity
+	    	expListView = (ExpandableListView) getActivity().findViewById(R.id.expListView);
+		
+		
+	    	listDataHeader = new ArrayList<String>(); 
+	    	listDataChild = new HashMap<String, List<String>>();
+	    	for (ACMDatabaseInfo deviceInf : deviceList)
+	    	{
+	    		// Adding header
+	    		listDataHeader.add(deviceInf.getName());
+			
+	    		// Adding children
+	    		listDataChild.put(deviceInf.getName(), deviceInf.getDeviceImagesNamesStatesAndSize());
 			
 			
-		}
+	    	}
 		        
-		listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild);
+	    	listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild);
 		 
-		// setting list adapter
-		expListView.setAdapter(listAdapter);
+	    	// setting list adapter
+	    	expListView.setAdapter(listAdapter);
 	    
-		expListView.setOnChildClickListener(new OnChildClickListener() {
-			@Override
-            public boolean onChildClick(ExpandableListView parent, View v,
-                    int groupPosition, int childPosition, long id) {
+	    	expListView.setOnChildClickListener(new OnChildClickListener() {
+	    		@Override
+	    		public boolean onChildClick(ExpandableListView parent, View v,
+	    				int groupPosition, int childPosition, long id) {
                 
-				// Make Toast to indicate which child was clicked
-                Toast.makeText(
-                        getActivity().getApplicationContext(),
-                        listDataHeader.get(groupPosition)
-                                + " : "
-                                + listDataChild.get(
-                                        listDataHeader.get(groupPosition)).get(
-                                        childPosition), Toast.LENGTH_SHORT).show();
+	    			// Make Toast to indicate which child was clicked
+	    			Toast.makeText(
+	    					getActivity().getApplicationContext(),
+	    					listDataHeader.get(groupPosition)
+	    					+ " : "
+	    					+ listDataChild.get(
+	    							listDataHeader.get(groupPosition)).get(
+	    									childPosition), Toast.LENGTH_SHORT).show();
                                
-                return false;
-            }
+	    			return false;
+	    		}
 			
+		    
 		});
+	    	
+
+		    } else {
+		    	Toast.makeText(
+    					getActivity().getApplicationContext(),"No internet connectivity!",1).show();
+		    }
 		
 	}
+	
+
+	    
 	
 	
 }
