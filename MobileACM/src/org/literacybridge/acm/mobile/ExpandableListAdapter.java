@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
  
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
@@ -52,7 +53,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         final String childText = (String) getChild(groupPosition, childPosition);
  
         final String imageName = childText.split(",")[0];
-        final String StateName = childText.split(",")[1];
+        String StateName = childText.split(",")[1];
         final String SizeName = childText.split(",")[2];
         
         if (convertView == null) {
@@ -65,11 +66,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 .findViewById(R.id.lblListItem);
         
         // Add image
-        //ImageView imgListView = (ImageView) convertView
-        //		.findViewById(R.id.imgListItem);
+        ImageView imgListView = (ImageView) convertView
+        		.findViewById(R.id.imgListItem);
         
+        // Add ProgressBar
+        ProgressBar proProgress = (ProgressBar) convertView
+        		.findViewById(R.id.progressBar1);
 
-        //imgListView.setImageResource(R.drawable.ic_launcher);
+
         
         TextView txtStatus = (TextView) convertView
                 .findViewById(R.id.lblStatus);
@@ -78,8 +82,42 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 .findViewById(R.id.lblSize);
         
         txtListChild.setText(imageName);
-        txtStatus.setText(StateName);
-        txtSize.setText(SizeName);
+      
+        txtSize.setText(convertSize(Long.valueOf(SizeName).longValue()));
+      
+        
+        if (childPosition == 0)
+        {
+        	StateName = "Downloaded";
+        }
+        else if (childPosition == 1)
+        {
+        	StateName = "NotDownloaded";
+        }
+        else if (childPosition == 2)
+        {
+        	StateName = "Downloading";
+        }
+        
+        
+        if (StateName.equals("Downloaded"))
+        {
+        	proProgress.setVisibility(View.GONE);
+        	imgListView.setVisibility(0); //To set visible
+        }
+        else if(StateName.equals("Downloading"))
+        {
+        	proProgress.setVisibility(0);
+        	imgListView.setVisibility(View.GONE); 
+        }
+        else if(StateName.equals("NotDownloaded"))
+        {
+           	proProgress.setVisibility(View.GONE);
+        	imgListView.setVisibility(View.GONE); 
+        }
+        //txtStatus.setText(StateName);
+        
+        
         
         return convertView;
     }
@@ -133,5 +171,25 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
     
+    private String convertSize(long sizeInBytes){
+    	String retSize = "";
+    	
+    	if (sizeInBytes > 1000)
+    	{
+    		retSize = (sizeInBytes/1000) + " KB";
+    		
+    		if (sizeInBytes > 1000000)
+    		{
+    			retSize = (sizeInBytes/1000000) + " MB";
+    		}
+    		
+    	}
+    	else
+    	{
+    		retSize = sizeInBytes + " B";
+    	} 
+    	
+    	return "Size: " + retSize;
+    }
     
 }

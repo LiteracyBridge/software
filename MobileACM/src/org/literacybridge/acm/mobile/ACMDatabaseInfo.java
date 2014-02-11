@@ -71,7 +71,8 @@ public class ACMDatabaseInfo {
 			this.path = path;
 			
 			// Set status to not available by default
-			this.status = Status.NotDownloaded;
+			this.status = Status.Downloaded;
+			
 		}
 		
 		public String getName() {
