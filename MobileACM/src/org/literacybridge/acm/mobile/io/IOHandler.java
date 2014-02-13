@@ -15,7 +15,7 @@ import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
 
 
-public class IOHandler {
+public class IOHandler{
     private final DropboxAPI<AndroidAuthSession> mApi;
     private final List<ACMDatabaseInfo> databaseInfos;
 	
@@ -73,5 +73,6 @@ public class IOHandler {
 	    	Log.d("Dropbox", "load", e);
 	    }
 	}
+	
 
 }

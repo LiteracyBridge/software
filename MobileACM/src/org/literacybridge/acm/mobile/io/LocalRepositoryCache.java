@@ -20,6 +20,6 @@ public class LocalRepositoryCache {
 		    len = in.read(buffer);
 		}
 		
-		fos.close();
+		out.close();
 	}
 }

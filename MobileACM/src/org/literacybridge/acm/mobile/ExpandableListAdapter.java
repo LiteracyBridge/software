@@ -1,5 +1,6 @@
 package org.literacybridge.acm.mobile;
  
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
  
@@ -9,20 +10,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
  
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
     private Context _context;
-    private List<String> _listDataHeader; // header titles
+    private List<String> _listDataHeader; // Database names
+    
     // child data in format of header title, child title
-    private HashMap<String, List<String>> _listDataChild;
+    private HashMap<String, List<String>> _listDataChild; // Device Image Names
+    
+    // downloadingState in format <
+    //private Dictionary<String, String> _dictDownloadingState; // 
  
     public ExpandableListAdapter(Context context, List<String> listDataHeader,
             HashMap<String, List<String>> listChildData) {
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listChildData;
+        
     }
  
     
@@ -44,6 +52,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
         final String childText = (String) getChild(groupPosition, childPosition);
  
+        final String imageName = childText.split(",")[0];
+        String StateName = childText.split(",")[1];
+        final String SizeName = childText.split(",")[2];
+        
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -52,8 +64,61 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
         TextView txtListChild = (TextView) convertView
                 .findViewById(R.id.lblListItem);
+        
+        // Add image
+        ImageView imgListView = (ImageView) convertView
+        		.findViewById(R.id.imgListItem);
+        
+        // Add ProgressBar
+        ProgressBar proProgress = (ProgressBar) convertView
+        		.findViewById(R.id.progressBar1);
+
+
+        
+        TextView txtStatus = (TextView) convertView
+                .findViewById(R.id.lblStatus);
  
-        txtListChild.setText(childText);
+        TextView txtSize = (TextView) convertView
+                .findViewById(R.id.lblSize);
+        
+        txtListChild.setText(imageName);
+      
+        txtSize.setText(convertSize(Long.valueOf(SizeName).longValue()));
+      
+        
+        if (childPosition == 0)
+        {
+        	StateName = "Downloaded";
+        }
+        else if (childPosition == 1)
+        {
+        	StateName = "NotDownloaded";
+        }
+        else if (childPosition == 2)
+        {
+        	StateName = "Downloading";
+        }
+        
+        
+        if (StateName.equals("Downloaded"))
+        {
+        	proProgress.setVisibility(View.GONE);
+        	imgListView.setVisibility(0); //To set visible
+        }
+        else if(StateName.equals("Downloading"))
+        {
+        	proProgress.setVisibility(0);
+        	imgListView.setVisibility(View.GONE); 
+        }
+        else if(StateName.equals("NotDownloaded"))
+        {
+           	proProgress.setVisibility(View.GONE);
+        	imgListView.setVisibility(View.GONE); 
+        }
+        //txtStatus.setText(StateName);
+        
+        
+        
         return convertView;
     }
  
@@ -106,5 +171,25 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
     
+    private String convertSize(long sizeInBytes){
+    	String retSize = "";
+    	
+    	if (sizeInBytes > 1000)
+    	{
+    		retSize = (sizeInBytes/1000) + " KB";
+    		
+    		if (sizeInBytes > 1000000)
+    		{
+    			retSize = (sizeInBytes/1000000) + " MB";
+    		}
+    		
+    	}
+    	else
+    	{
+    		retSize = sizeInBytes + " B";
+    	} 
+    	
+    	return "Size: " + retSize;
+    }
     
 }

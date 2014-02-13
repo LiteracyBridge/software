@@ -36,6 +36,18 @@ public class ACMDatabaseInfo {
 		return listNames;
 		
 	}
+
+	public List<String> getDeviceImagesNamesStatesAndSize() {
+		
+		List<String> listNames = new ArrayList<String>();
+		for (DeviceImage img : deviceImages)
+		{
+			listNames.add(img.getName() + "," + img.getStatus() + "," + img.getSizeInBytes());
+		}
+		
+		return listNames;
+		
+	}
 	
 	@Override
 	public String toString() {
@@ -46,7 +58,7 @@ public class ACMDatabaseInfo {
 		public static enum Status {
 			Downloading,
 			Downloaded,
-			NotAvailable
+			NotDownloaded
 		}
 		
 		private final String name;
@@ -57,6 +69,10 @@ public class ACMDatabaseInfo {
 		public DeviceImage(String name, String path) {
 			this.name = name;
 			this.path = path;
+			
+			// Set status to not available by default
+			this.status = Status.Downloaded;
+			
 		}
 		
 		public String getName() {
