@@ -3,8 +3,8 @@ package org.literacybridge.acm.mobile.dropbox;
 import java.util.List;
 
 import org.literacybridge.acm.mobile.ACMDatabaseInfo;
-import org.literacybridge.acm.mobile.IOHandler;
 import org.literacybridge.acm.mobile.OnlineImages;
+import org.literacybridge.acm.mobile.io.IOHandler;
 
 
 import android.app.Activity;

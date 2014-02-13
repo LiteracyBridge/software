@@ -1,13 +1,15 @@
-package org.literacybridge.acm.mobile;
+package org.literacybridge.acm.mobile.io;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
+
+import org.literacybridge.acm.mobile.ACMDatabaseInfo;
 
 import android.util.Log;
 
 import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.DropboxInputStream;
 import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
@@ -36,36 +38,9 @@ public class IOHandler {
     	return Collections.unmodifiableList(databaseInfos);
     }
     
-    public void copy(ACMDatabaseInfo.DeviceImage image) {
-    	// TODO: copy
-    }
-    
-    public HashMap<String, List<String>> getDatabaseInfoMap()
-    {
-    	HashMap<String, List<String>> returnMap = new HashMap<String, List<String>>();
-    	
-    	List<String> db1_list = new ArrayList<String>();
-    	db1_list.add("Contains not much data.");
-    	db1_list.add("Really not much");
-    	db1_list.add("Nothing to see here!");
-    	
-    	List<String> db2_list = new ArrayList<String>();
-    	db2_list.add("Useful data");
-    	db2_list.add("Very reusable");
-    	db2_list.add("Valuable datasets");
-    	
-    	List<String> db3_list = new ArrayList<String>();
-    	db3_list.add("Average data stack");
-    	db3_list.add("Some good - some bad");
-    	db3_list.add("Overall average!");
-    	
-    	
-    	returnMap.put("Crappy data", db1_list);
-    	returnMap.put("A+ data", db2_list);
-    	returnMap.put("Standard stuff", db3_list);
-    	
-    	return returnMap;
-    	
+    public DropboxInputStream getInputStream(String path) throws DropboxException {
+    	// setting revision to null to get latest version of the file
+    	return mApi.getFileStream(path, null);
     }
     
 	public void refresh() {
