@@ -116,7 +116,7 @@ public class DropboxClient extends Activity {
         	for (ACMDatabaseInfo db : dbs) {
         		Log.d("michael", db.getName());
         		for (ACMDatabaseInfo.DeviceImage image : db.getDeviceImages()) {
-        			Log.d("michael", "\t" + image.getName() + "  ->  " + image.getPath());
+        			Log.d("michael", "\t" + image.getName() + "  ->  " + image.getPath() + " (" + image.getSizeInBytes() + " bytes)");
         			
         		}
         	}

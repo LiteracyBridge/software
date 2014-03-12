@@ -66,9 +66,10 @@ public class ACMDatabaseInfo {
 		private long sizeInBytes;
 		private Status status;
 		
-		public DeviceImage(String name, String path) {
+		public DeviceImage(String name, String path, long sizeInBytes) {
 			this.name = name;
 			this.path = path;
+			this.sizeInBytes = sizeInBytes;
 			
 			// Set status to not available by default
 			this.status = Status.Downloaded;

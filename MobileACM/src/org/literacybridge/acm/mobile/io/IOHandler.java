@@ -55,11 +55,15 @@ public class IOHandler{
 	            		if (ent1.fileName().equals("accessList.txt")) {
 	            			ACMDatabaseInfo dbInfo = new ACMDatabaseInfo(ent.fileName());
 	            			Log.d("michael", "ent.path=" + ent.path);
-	            			String tbLoadersPath = ent.path + "/TB-Loaders/active";
+	            			String tbLoadersPath = ent.path + "/TB-Loaders/TB-Loaders/content";
 	            			try {
 		            			Entry images = mApi.metadata(tbLoadersPath, 1000, null, true, null);
 		            			for (Entry image : images.contents) {
-		            				dbInfo.addDeviceImage(new ACMDatabaseInfo.DeviceImage(image.fileName(), image.path));
+		            				long sizeInBytes = calculateSize(image.path + "/basic/messages/audio")
+		            						+ calculateSize(image.path + "/basic/inbox/messages");;
+		            				
+		            				dbInfo.addDeviceImage(new ACMDatabaseInfo.DeviceImage(image.fileName(), image.path,
+		            						sizeInBytes));
 		            			}
 		            			databaseInfos.add(dbInfo);
 	            			} catch (DropboxException e) {
@@ -74,5 +78,15 @@ public class IOHandler{
 	    }
 	}
 	
-
+	private long calculateSize(String path) throws DropboxException {
+		Log.d("size", path);
+		List<Entry> files = mApi.metadata(path, 1000, null, true, null).contents;
+		long size = 0;
+		if (files != null) {
+			for (Entry entry : files) {
+				size += entry.bytes;
+			}
+		}
+		return size;
+	}
 }
