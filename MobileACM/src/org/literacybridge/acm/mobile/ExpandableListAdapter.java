@@ -1,6 +1,5 @@
 package org.literacybridge.acm.mobile;
  
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
  
@@ -85,7 +84,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
       
         txtSize.setText(convertSize(Long.valueOf(SizeName).longValue()));
       
-        
+        // Set dummy values
         if (childPosition == 0)
         {
         	StateName = "Downloaded";
@@ -94,16 +93,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         {
         	StateName = "NotDownloaded";
         }
-        else if (childPosition == 2)
+        else if (childPosition == 4)
         {
         	StateName = "Downloading";
         }
-        
+        else if (childPosition == 2)
+        {
+        	StateName = "FailedDownload";
+        }        
+
         
         if (StateName.equals("Downloaded"))
         {
         	proProgress.setVisibility(View.GONE);
         	imgListView.setVisibility(0); //To set visible
+        	imgListView.setImageResource(R.drawable.download);
         }
         else if(StateName.equals("Downloading"))
         {
@@ -115,10 +119,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
            	proProgress.setVisibility(View.GONE);
         	imgListView.setVisibility(View.GONE); 
         }
-        //txtStatus.setText(StateName);
-        
-        
-        
+        else if(StateName.equals("FailedDownload"))
+        {
+           	proProgress.setVisibility(View.GONE);
+        	imgListView.setVisibility(0);
+        	imgListView.setImageResource(R.drawable.failed);
+        	
+        }
+               
         return convertView;
     }
  
@@ -174,13 +182,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private String convertSize(long sizeInBytes){
     	String retSize = "";
     	
-    	if (sizeInBytes > 1000)
+    	if (sizeInBytes > 1024)
     	{
-    		retSize = (sizeInBytes/1000) + " KB";
+    		retSize = (sizeInBytes/1024) + " KB";
     		
-    		if (sizeInBytes > 1000000)
+    		if (sizeInBytes > 1024000)
     		{
-    			retSize = (sizeInBytes/1000000) + " MB";
+    			retSize = (sizeInBytes/1024000) + " MB";
     		}
     		
     	}

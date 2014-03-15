@@ -58,7 +58,8 @@ public class ACMDatabaseInfo {
 		public static enum Status {
 			Downloading,
 			Downloaded,
-			NotDownloaded
+			NotDownloaded,
+			FailedDownload
 		}
 		
 		private final String name;
