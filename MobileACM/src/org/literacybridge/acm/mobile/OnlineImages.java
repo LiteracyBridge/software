@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
@@ -36,7 +37,7 @@ public class OnlineImages extends FragmentActivity implements ActionBar.TabListe
     private ActionBar actionBar;
     // Tab titles
     private String[] tabs = { "Downloads", "Library", "TalkingBook" };
-    
+
 
 
     
@@ -51,7 +52,8 @@ public class OnlineImages extends FragmentActivity implements ActionBar.TabListe
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
- 
+
+        
         viewPager.setAdapter(mAdapter);
         //actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);        

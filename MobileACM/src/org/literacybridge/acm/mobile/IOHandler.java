@@ -20,6 +20,7 @@ public class IOHandler{
 	
     private static volatile IOHandler singleton;
 
+
     public static synchronized void init(DropboxAPI<AndroidAuthSession> mApi) {
     	singleton = new IOHandler(mApi);
     }
@@ -95,7 +96,9 @@ public class IOHandler{
 	            	}
 	            }
 	        }
+
 	    } catch (DropboxException e) {	
+
 	    	Log.d("Dropbox", "load", e);
 	    }
 	}
