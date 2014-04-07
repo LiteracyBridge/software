@@ -5,17 +5,40 @@
     android:background="#ffffff"
     android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="fill_parent"
+    <Button
+        android:id="@+id/libButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:text="Library view"
-        android:textSize="20dp" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="Reset" />
 
-	<ListView
-	    android:id="@+id/listview"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content" />
+    <ListView
+        android:id="@+id/libListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/libButton" >
+
+    </ListView>
+
+    <TextView
+        android:id="@+id/libTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/libButton"
+        android:layout_alignBottom="@+id/libButton"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="15dp"
+        android:text="Question"
+        android:textSize="20sp" />
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/libTextView"
+        android:layout_toLeftOf="@+id/libButton" >
+    </FrameLayout>
 
 </RelativeLayout>
