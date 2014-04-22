@@ -30,7 +30,7 @@ public class DeviceImageLoader {
 //		copyStatsFromDevice();
 //		formatDevice();
 //		checkDisk();
-		copyImageToDevice();
+		formatDevice();
 		
 		return Result.SUCCESS;
 	}
@@ -41,12 +41,15 @@ public class DeviceImageLoader {
 	
 	private void formatDevice() throws IOException {
 		try {
-			runAsRoot("umount /storage/UsbDriveA",
-					  "mkfs.exfat -t fat32 -c 0 /dev/block/vold/8:1",
-					  "mount -t vfat -o rw /dev/block/vold/8:1 /mnt/UsbDriveA");
+			runAsRoot("mkdir /data/media/0/usbStorage/sda1",
+					  "/system/bin/umount /data/media/0/usbStorage/sda1",
+					  "/system/xbin/mkfs.vfat -v /dev/block/sda1",
+					  "/system/bin/mount -t vfat -o rw /dev/block/sda1 /data/media/0/usbStorage/sda1");
 		} catch (Exception e) {
 			Log.d("michael", "Error", e);
 		}
+		
+		
 	}
 	
 	private void checkDisk() throws IOException {
@@ -62,7 +65,7 @@ public class DeviceImageLoader {
 		File test = new File(deviceRoot, "test.txt");
 		
 		FileWriter writer = new FileWriter(test);
-		writer.append("Chris hat keinen kleinen Penis.");
+		writer.append("Michael hat einen noch kleineren Penis.");
 		writer.flush();
 		writer.close();
 	}

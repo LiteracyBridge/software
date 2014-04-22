@@ -28,15 +28,7 @@ public class TBFragment extends Fragment {
 		formatButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-            	//File deleteFile = new File("/storage/sdcard0/DCIM/Camera/20140412_205621.jpg");
-            	//deleteFile.delete();
-            	
-            	//android.os.Environment.get
-            	//Format SD card
-            	//wipingSdcard();
-                
-            	//wipeDirectory("/storage/sdcard0/DCIM/Camera");
-            	
+
             	try {
 					DeviceImageLoader.getInstance().imageDevice();
 				} catch (IOException e) {
@@ -53,45 +45,6 @@ public class TBFragment extends Fragment {
 	    
 	}
 	
-	
-	public void wipingSdcard() {
-        File deleteMatchingFile = new File(Environment
-                .getExternalStorageDirectory().toString());
-        try {
-            File[] filenames = deleteMatchingFile.listFiles();
-            if (filenames != null && filenames.length > 0) {
-                for (File tempFile : filenames) {
-                    if (tempFile.isDirectory()) {
-                        wipeDirectory(tempFile.toString());
-                        tempFile.delete();
-                    } else {
-                        tempFile.delete();
-                    }
-                }
-            } else {
-                deleteMatchingFile.delete();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    private void wipeDirectory(String name) {
-        File directoryFile = new File(name);
-        File[] filenames = directoryFile.listFiles();
-        if (filenames != null && filenames.length > 0) {
-            for (File tempFile : filenames) {
-                if (tempFile.isDirectory()) {
-                    wipeDirectory(tempFile.toString());
-                    tempFile.delete();
-                } else {
-                    tempFile.delete();
-                }
-            }
-        } else {
-            directoryFile.delete();
-        }
-    }
-	
 	
 }
