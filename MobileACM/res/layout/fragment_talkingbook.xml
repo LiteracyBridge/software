@@ -11,6 +11,15 @@
         android:text="Talkingbook view"
         android:textSize="20dp"
         android:layout_centerInParent="true"/>
-     
+
+    <Button
+        android:id="@+id/btnFormat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="24dp"
+        android:text="Format SD card" />
  
 </RelativeLayout>
