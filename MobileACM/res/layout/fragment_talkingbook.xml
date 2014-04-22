@@ -4,22 +4,44 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#ffffff">
-     
-    <TextView android:layout_width="fill_parent"
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Talkingbook view"
-        android:textSize="20dp"
-        android:layout_centerInParent="true"/>
+        android:layout_alignLeft="@+id/btnFormat"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
+        android:text="Connection status:"
+        android:textSize="16sp" />
 
     <Button
         android:id="@+id/btnFormat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="24dp"
+        android:layout_below="@+id/textView1"
+        android:layout_marginLeft="29dp"
+        android:layout_marginTop="47dp"
         android:text="Format SD card" />
+
+    <Button
+        android:id="@+id/btnCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btnFormat"
+        android:layout_alignRight="@+id/btnFormat"
+        android:layout_below="@+id/btnFormat"
+        android:layout_marginTop="20dp"
+        android:text="Check SD crd" />
+
+    <Button
+        android:id="@+id/btnStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btnCheck"
+        android:layout_below="@+id/btnCheck"
+        android:layout_marginTop="18dp"
+        android:text="Copy statistics" />
  
 </RelativeLayout>
