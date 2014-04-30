@@ -33,6 +33,7 @@ public class DeviceImageLoader {
 //		formatDevice();
 //		checkDisk();
 //		formatDevice();
+		formatDevice();
 		
 		return Result.SUCCESS;
 	}
@@ -73,5 +74,44 @@ public class DeviceImageLoader {
 //		writer.close();
 	}
 	
-
+	private void formatDevice() throws IOException {
+		try {
+			runAsRoot("mkdir /data/media/0/usbStorage/sda1",
+					  "/system/bin/umount /data/media/0/usbStorage/sda1",
+					  "/system/xbin/mkfs.vfat -v /dev/block/sda1",
+					  "/system/bin/mount -t vfat -o rw /dev/block/sda1 /data/media/0/usbStorage/sda1");
+		} catch (Exception e) {
+			Log.d("michael", "Error", e);
+		}
+		
+		
+	}
+	
+	private void checkDisk() throws IOException {
+		try {
+			runAsRoot("/system/bin/fsck.exfat -R /dev/block/vold/8:1");
+		} catch (Exception e) {
+			Log.d("michael", "Error", e);
+		}
+	}
+	
+	public boolean runAsRoot(String... cmds) throws Exception {
+        Process p = Runtime.getRuntime().exec("su");
+        DataOutputStream os = new DataOutputStream(p.getOutputStream());            
+        for (String tmpCmd : cmds) {
+                os.writeBytes(tmpCmd+"\n");
+        }           
+        os.writeBytes("exit\n");  
+        os.flush();
+        return p.waitFor() == 0;
+    }
+		
+	static void consumeProcessOutput(Process proc, boolean listenToStdErr) throws IOException {
+		InputStream stderr = listenToStdErr ? proc.getErrorStream() : proc.getInputStream(); 
+		InputStreamReader isr = new InputStreamReader(stderr);
+		BufferedReader br = new BufferedReader(isr);
+		String line = null;
+	
+		while ((line = br.readLine()) != null);
+	}
 }
