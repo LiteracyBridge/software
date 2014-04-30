@@ -36,8 +36,6 @@ public class QAFragment extends Fragment{
                     .add(R.id.fragment_container, firstFragment).commit();
         }
     
-		
-		
 	    return rootView;
 	    
 	}

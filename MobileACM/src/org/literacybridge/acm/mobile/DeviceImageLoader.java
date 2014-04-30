@@ -65,7 +65,7 @@ public class DeviceImageLoader {
 		File test = new File(deviceRoot, "test.txt");
 		
 		FileWriter writer = new FileWriter(test);
-		writer.append("Michael hat einen noch kleineren Penis.");
+		writer.append("testfile");
 		writer.flush();
 		writer.close();
 	}
