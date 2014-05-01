@@ -1,14 +1,7 @@
 package org.literacybridge.acm.mobile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import org.literacybridge.acm.mobile.R;
-
-import android.app.ActivityManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -30,14 +23,12 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
     
 	ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
-    List<String> listDataHeader;
-    HashMap<String, List<String>> listDataChild;
     ConnectivityManager connMgr;
 
     private Handler handler = new Handler();
     	
     private Button refreshButton;
-	
+    
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 			Bundle savedInstanceState) {
@@ -57,7 +48,6 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
 		   @Override
 		   public void run() {
 		      /* do what you need to do */
-		      Log.d("bruno", "Timer fired!");
 		      /* and here comes the "trick" */
 		      handler.postDelayed(this, 1000);
 		   }
@@ -103,20 +93,7 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
     	expListView = (ExpandableListView) getActivity().findViewById(R.id.expListView);
 	
 	
-    	listDataHeader = new ArrayList<String>(); 
-    	listDataChild = new HashMap<String, List<String>>();
-    	for (ACMDatabaseInfo deviceInf : deviceList)
-    	{
-    		// Adding header
-    		listDataHeader.add(deviceInf.getName());
-		
-    		// Adding children
-    		listDataChild.put(deviceInf.getName(), deviceInf.getDeviceImagesNamesStatesAndSize());
-		
-		
-    	}
-	        
-    	listAdapter = new ExpandableListAdapter(getActivity(), listDataHeader, listDataChild);
+    	listAdapter = new ExpandableListAdapter(getActivity(), deviceList);
 	 
     	
     	// setting list adapter
@@ -127,14 +104,9 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
     		public boolean onChildClick(ExpandableListView parent, View v,
     				int groupPosition, int childPosition, long id) {
             
-    			// Make Toast to indicate which child was clicked
-    			Toast.makeText(
-    					getActivity().getApplicationContext(),
-    					listDataHeader.get(groupPosition)
-    					+ " : "
-    					+ listDataChild.get(
-    							listDataHeader.get(groupPosition)).get(
-    									childPosition), Toast.LENGTH_SHORT).show();
+    			ACMDatabaseInfo.DeviceImage image = 
+    					deviceList.get(groupPosition).getDeviceImages().get(childPosition);
+    			IOHandler.getInstance().store(getActivity().getBaseContext(), image);
                            
     			return false;
     		}

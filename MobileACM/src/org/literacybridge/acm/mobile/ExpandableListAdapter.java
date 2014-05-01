@@ -1,8 +1,7 @@
 package org.literacybridge.acm.mobile;
  
-import java.util.HashMap;
 import java.util.List;
- 
+
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -16,28 +15,16 @@ import android.widget.TextView;
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
     private Context _context;
-    private List<String> _listDataHeader; // Database names
+    private List<ACMDatabaseInfo> listData; // Database names
     
-    // child data in format of header title, child title
-    private HashMap<String, List<String>> _listDataChild; // Device Image Names
-    
-    // downloadingState in format <
-    //private Dictionary<String, String> _dictDownloadingState; // 
- 
-    public ExpandableListAdapter(Context context, List<String> listDataHeader,
-            HashMap<String, List<String>> listChildData) {
+    public ExpandableListAdapter(Context context, List<ACMDatabaseInfo> listData) {
         this._context = context;
-        this._listDataHeader = listDataHeader;
-        this._listDataChild = listChildData;
-        
+        this.listData = listData;
     }
- 
-    
     
     @Override
     public Object getChild(int groupPosition, int childPosititon) {
-        return this._listDataChild.get(this._listDataHeader.get(groupPosition))
-                .get(childPosititon);
+        return this.listData.get(groupPosition).getDeviceImages().get(childPosititon);
     }
  
     @Override
@@ -49,11 +36,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, final int childPosition,
             boolean isLastChild, View convertView, ViewGroup parent) {
  
-        final String childText = (String) getChild(groupPosition, childPosition);
+        final ACMDatabaseInfo.DeviceImage child = 
+        		(ACMDatabaseInfo.DeviceImage) getChild(groupPosition, childPosition);
  
-        final String imageName = childText.split(",")[0];
-        String StateName = childText.split(",")[1];
-        final String SizeName = childText.split(",")[2];
+        final String imageName = child.getName();
+        String StateName = child.getStatus().name();
         
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
@@ -82,7 +69,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         
         txtListChild.setText(imageName);
       
-        txtSize.setText(convertSize(Long.valueOf(SizeName).longValue()));
+        txtSize.setText(convertSize(child.getSizeInBytes()));
       
         // Set dummy values
         if (childPosition == 0)
@@ -132,18 +119,17 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
     @Override
     public int getChildrenCount(int groupPosition) {
-        return this._listDataChild.get(this._listDataHeader.get(groupPosition))
-                .size();
+        return this.listData.get(groupPosition).getDeviceImages().size();
     }
  
     @Override
     public Object getGroup(int groupPosition) {
-        return this._listDataHeader.get(groupPosition);
+        return this.listData.get(groupPosition);
     }
  
     @Override
     public int getGroupCount() {
-        return this._listDataHeader.size();
+        return this.listData.size();
     }
  
     @Override
@@ -154,7 +140,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded,
             View convertView, ViewGroup parent) {
-        String headerTitle = (String) getGroup(groupPosition);
+        String headerTitle = ((ACMDatabaseInfo) getGroup(groupPosition)).getName();
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);

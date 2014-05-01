@@ -1,18 +1,23 @@
 package org.literacybridge.acm.mobile;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
+import org.literacybridge.acm.mobile.ACMDatabaseInfo.DeviceImage.Status;
+
+import android.content.Context;
 import android.util.Log;
 
 import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.DropboxAPI.DropboxInputStream;
 import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
-
 
 public class IOHandler{
     private final DropboxAPI<AndroidAuthSession> mApi;
@@ -38,36 +43,55 @@ public class IOHandler{
     	return Collections.unmodifiableList(databaseInfos);
     }
     
-    public void copy(ACMDatabaseInfo.DeviceImage image) {
-    	// TODO: copy
+    public void store(Context context, ACMDatabaseInfo.DeviceImage image) {
+    	final String localBasePath = "dbs/" + image.getDatabaseInfo().getName() + "/" + image.getName();
+    	File localBaseDir = new File(context.getFilesDir(), localBasePath);
+    	image.setStatus(Status.Downloading);
+    	
+    	try {
+	        Entry entry = mApi.metadata(image.getPath(), 1000, null, true, null);
+	        store(context, entry, entry.path, localBaseDir);
+    		image.setStatus(Status.Downloaded);
+    	} catch (DropboxException e) {
+    		image.setStatus(Status.FailedDownload);
+    		Log.d("download", "Failed", e);
+    	} catch (IOException e) {
+    		image.setStatus(Status.FailedDownload);
+    		Log.d("download", "Failed", e);
+    	}
     }
     
-    public HashMap<String, List<String>> getDatabaseInfoMap()
-    {
-    	HashMap<String, List<String>> returnMap = new HashMap<String, List<String>>();
+    private void store(Context context, Entry entry, String dropboxBasePath, 
+    		           File localBasePath) throws DropboxException, IOException {
+    	Log.d("michael", "store " + entry.path);
+
+    	String relativePath = entry.path.substring(dropboxBasePath.length());
+    	File file = new File(localBasePath, relativePath);
     	
-    	List<String> db1_list = new ArrayList<String>();
-    	db1_list.add("Contains not much data.");
-    	db1_list.add("Really not much");
-    	db1_list.add("Nothing to see here!");
-    	
-    	List<String> db2_list = new ArrayList<String>();
-    	db2_list.add("Useful data");
-    	db2_list.add("Very reusable");
-    	db2_list.add("Valuable datasets");
-    	
-    	List<String> db3_list = new ArrayList<String>();
-    	db3_list.add("Average data stack");
-    	db3_list.add("Some good - some bad");
-    	db3_list.add("Overall average!");
-    	
-    	
-    	returnMap.put("Crappy data", db1_list);
-    	returnMap.put("A+ data", db2_list);
-    	returnMap.put("Standard stuff", db3_list);
-    	
-    	return returnMap;
-    	
+        if (entry.isDir) {
+        	Log.d("michael", "store dir " + entry.path);
+        	file.mkdirs();
+            for (Entry ent: entry.contents) {
+	        	Entry sub = mApi.metadata(ent.path, 1000, null, true, null);
+	        	store(context, sub, dropboxBasePath, localBasePath);
+            }
+        } else {
+        	OutputStream out = null;
+        	
+        	try {
+        		out = new BufferedOutputStream(new FileOutputStream(file));     	
+        		mApi.getFile(entry.path, null, out, null);
+        		Log.d("michael", "downloaded " + entry.path + " to " + file.getAbsolutePath());
+        	} finally {
+        		if (out != null) {
+        			try {
+        				out.close();
+        			} catch (IOException e) {
+        				// ignore
+        			}
+        		}
+        	}
+        }
     }
     
 	public void refresh() {
@@ -86,7 +110,7 @@ public class IOHandler{
 	            			try {
 		            			Entry images = mApi.metadata(tbLoadersPath, 1000, null, true, null);
 		            			for (Entry image : images.contents) {
-		            				dbInfo.addDeviceImage(new ACMDatabaseInfo.DeviceImage(image.fileName(), image.path));
+		            				dbInfo.addDeviceImage(new ACMDatabaseInfo.DeviceImage(dbInfo, image.fileName(), image.path));
 		            			}
 		            			databaseInfos.add(dbInfo);
 	            			} catch (DropboxException e) {
@@ -98,10 +122,7 @@ public class IOHandler{
 	        }
 
 	    } catch (DropboxException e) {	
-
 	    	Log.d("Dropbox", "load", e);
 	    }
 	}
-	
-
 }

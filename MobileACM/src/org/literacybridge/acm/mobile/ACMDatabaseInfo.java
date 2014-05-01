@@ -62,18 +62,24 @@ public class ACMDatabaseInfo {
 			FailedDownload
 		}
 		
+		private final ACMDatabaseInfo database;
 		private final String name;
 		private final String path;
 		private long sizeInBytes;
 		private Status status;
 		
-		public DeviceImage(String name, String path) {
+		public DeviceImage(ACMDatabaseInfo database, String name, String path) {
+			this.database = database;
 			this.name = name;
 			this.path = path;
 			
 			// Set status to not available by default
-			this.status = Status.Downloaded;
+			this.status = Status.NotDownloaded;
 			
+		}
+		
+		public ACMDatabaseInfo getDatabaseInfo() {
+			return database;
 		}
 		
 		public String getName() {
@@ -86,6 +92,10 @@ public class ACMDatabaseInfo {
 		
 		public Status getStatus() {
 			return status;
+		}
+		
+		public void setStatus(Status status) {
+			this.status = status;
 		}
 		
 		public long getSizeInBytes() {

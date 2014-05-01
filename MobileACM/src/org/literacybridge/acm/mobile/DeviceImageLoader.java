@@ -63,7 +63,7 @@ public class DeviceImageLoader {
 		}
 		
 		
-		DiskUtils.rsync(source, targetPath);
+		//DiskUtils.rsync(source, targetPath);
 		
 //		File deviceRoot = new File("/storage/UsbDriveA");
 //		File test = new File(deviceRoot, "test.txt");
