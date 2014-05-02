@@ -71,6 +71,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
       
         txtSize.setText(convertSize(child.getSizeInBytes()));
       
+        /*
         // Set dummy values
         if (childPosition == 0)
         {
@@ -87,7 +88,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         else if (childPosition == 2)
         {
         	StateName = "FailedDownload";
-        }        
+        } 
+        */       
 
         
         if (StateName.equals("Downloaded"))

@@ -45,7 +45,6 @@ public class OnlineImages extends FragmentActivity implements ActionBar.TabListe
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		Log.d("bruno", "OnlineImages Activity talks to you!");
 		setContentView(R.layout.activity_online_images);
 		
 		// Initialization

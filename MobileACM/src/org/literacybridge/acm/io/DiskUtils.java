@@ -11,6 +11,11 @@ import java.util.List;
 import android.util.Pair;
 
 public class DiskUtils {
+	
+	private final static String TBMountDirectory = "/data/media/0/usbStorage/sda1";
+	private final static String TBDevDirectory = "/dev/block/sda1";
+			
+	
 	/**
 	 * Performs an "rsync", which means that this method will try to 
 	 * copy the current state of source to the target by making the least
@@ -38,16 +43,22 @@ public class DiskUtils {
 	}
 	
 	public static void formatDevice() throws IOException {
-		runAsRoot("mkdir /data/media/0/usbStorage/sda1",
-				  "/system/bin/umount /data/media/0/usbStorage/sda1",
-				  "/system/xbin/mkfs.vfat -v /dev/block/sda1",
-				  "/system/bin/mount -t vfat -o rw /dev/block/sda1 /data/media/0/usbStorage/sda1");
+		runAsRoot("mkdir" + TBMountDirectory,
+				  "/system/bin/umount " + TBMountDirectory,
+				  "/system/xbin/mkfs.vfat -v " + TBDevDirectory,
+				  "/system/bin/mount -t vfat -o rw " + TBDevDirectory  + " " + TBMountDirectory);
 		
 	}
 	
 	public static boolean checkDisk(boolean repair) throws IOException {
 		// TODO: use repair flag
-		return runAsRoot("/system/bin/fsck.exfat -R /dev/block/vold/8:1"); 
+		return runAsRoot("/system/bin/fsck.exfat -R " + TBDevDirectory); 
+	}
+	
+	public static void unmount() throws IOException {
+		
+		runAsRoot( "/system/bin/umount " + TBMountDirectory);
+
 	}
 
 	public static boolean runAsRoot(String... cmds) throws IOException {
