@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class OnlineFragment extends Fragment implements View.OnClickListener {
@@ -22,10 +23,12 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
   ExpandableListAdapter listAdapter;
   ExpandableListView expListView;
   ConnectivityManager connMgr;
+  
 
   private Handler handler = new Handler();
 
   private Button refreshButton;
+  private ProgressBar progressBar;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,7 +39,8 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
 
     refreshButton = (Button) rootView.findViewById(R.id.btnRefresh);
     refreshButton.setOnClickListener(this);
-
+    progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarLoading);
+    
     handler.postDelayed(runnable, 1000);
 
     return rootView;
@@ -89,6 +93,8 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
   }
 
   private void loadDeviceList() {
+    
+    progressBar.setVisibility(0);
     new DownloadLibraryInfosTask().execute();
   }
 
@@ -135,12 +141,15 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
             }
           }).start();;
 
+          
+          
           return false;
         }
 
       });
       
       listAdapter.notifyDataSetChanged();
+      progressBar.setVisibility(View.GONE);
     }
   }
 }
