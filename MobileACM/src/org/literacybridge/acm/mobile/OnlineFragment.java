@@ -2,28 +2,22 @@ package org.literacybridge.acm.mobile;
 
 import java.util.List;
 
-import org.literacybridge.acm.mobile.ACMDatabaseInfo.DeviceImage;
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class OnlineFragment extends Fragment implements View.OnClickListener {
-
-  List<ACMDatabaseInfo> deviceList;
 
   ExpandableListAdapter listAdapter;
   ExpandableListView expListView;
@@ -52,63 +46,25 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
   private Runnable runnable = new Runnable() {
     @Override
     public void run() {
-
-      // Refresh device list
-      // loadDeviceList();
-      Log.d("UI", "Refreshing device list");
-
-      // updateDownloadingStates();
       listAdapter.notifyDataSetChanged();
 
       handler.postDelayed(this, 1000);
     }
   };
 
-  private void updateDownloadingStates() {
-    // Add image
-    ImageView imgListView = (ImageView) getView()
-        .findViewById(R.id.imgListItem);
-
-    // Add ProgressBar
-    ProgressBar proProgress = (ProgressBar) getView().findViewById(
-        R.id.progressBar1);
-
-    deviceList = IOHandler.getInstance().getDatabaseInfos();
-
-    for (ACMDatabaseInfo dbInfo : deviceList) {
-      for (DeviceImage dImg : dbInfo.getDeviceImages()) {
-
-        String StateName = dImg.getStatus().name();
-
-        // Log.d("UI", "DeviceImage=" + dImg.getName() + " StateName=" +
-        // StateName);
-
-        if (StateName.equals("Downloaded")) {
-          proProgress.setVisibility(View.GONE);
-          imgListView.setVisibility(0); // To set visible
-          imgListView.setImageResource(R.drawable.download);
-        } else if (StateName.equals("Downloading")) {
-          proProgress.setVisibility(0);
-          imgListView.setVisibility(View.GONE);
-        } else if (StateName.equals("NotDownloaded")) {
-          proProgress.setVisibility(View.GONE);
-          imgListView.setVisibility(View.GONE);
-        } else if (StateName.equals("FailedDownload")) {
-          proProgress.setVisibility(View.GONE);
-          imgListView.setVisibility(0);
-          imgListView.setImageResource(R.drawable.failed);
-
-        }
-
-      }
-    }
-
-  }
-
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
 
+    // Set ExpandeableListView to activity
+    expListView = (ExpandableListView) getActivity().findViewById(
+        R.id.expListView);
+
+    listAdapter = new ExpandableListAdapter(getActivity());
+
+    // setting list adapter
+    expListView.setAdapter(listAdapter);
+    
     connMgr = (ConnectivityManager) getActivity().getSystemService(
         Context.CONNECTIVITY_SERVICE);
 
@@ -130,36 +86,10 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
       refreshButton.setVisibility(0);
 
     }
-
   }
 
   private void loadDeviceList() {
-    IOHandler.getInstance().refresh();
-    deviceList = IOHandler.getInstance().getDatabaseInfos();
-    Log.d("UI", "Size = " + deviceList.get(0).getName());
-
-    // Set ExpandeableListView to activity
-    expListView = (ExpandableListView) getActivity().findViewById(
-        R.id.expListView);
-
-    listAdapter = new ExpandableListAdapter(getActivity(), deviceList);
-
-    // setting list adapter
-    expListView.setAdapter(listAdapter);
-
-    expListView.setOnChildClickListener(new OnChildClickListener() {
-      @Override
-      public boolean onChildClick(ExpandableListView parent, View v,
-          int groupPosition, int childPosition, long id) {
-
-        ACMDatabaseInfo.DeviceImage image = deviceList.get(groupPosition)
-            .getDeviceImages().get(childPosition);
-        IOHandler.getInstance().store(getActivity().getBaseContext(), image);
-
-        return false;
-      }
-
-    });
+    new DownloadLibraryInfosTask().execute();
   }
 
   @Override
@@ -176,5 +106,41 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
     }
 
   }
+  
+  private class DownloadLibraryInfosTask extends AsyncTask<Void, Void, List<ACMDatabaseInfo>> {
+    /** The system calls this to perform work in a worker thread and
+      * delivers it the parameters given to AsyncTask.execute() */
+    @Override
+    protected List<ACMDatabaseInfo> doInBackground(Void... nothing) {
+      IOHandler.getInstance().refresh();
+      return IOHandler.getInstance().getDatabaseInfos();
+    }
+    
+    /** The system calls this to perform work in the UI thread and delivers
+      * the result from doInBackground() */
+    @Override
+    protected void onPostExecute(final List<ACMDatabaseInfo> result) {
+      listAdapter.setListData(result);
+      
+      expListView.setOnChildClickListener(new OnChildClickListener() {
+        @Override
+        public boolean onChildClick(ExpandableListView parent, View v,
+            int groupPosition, int childPosition, long id) {
 
+          final ACMDatabaseInfo.DeviceImage image = result.get(groupPosition)
+              .getDeviceImages().get(childPosition);
+          new Thread(new Runnable() {            
+            @Override public void run() {
+              IOHandler.getInstance().store(getActivity().getBaseContext(), image);
+            }
+          }).start();;
+
+          return false;
+        }
+
+      });
+      
+      listAdapter.notifyDataSetChanged();
+    }
+  }
 }

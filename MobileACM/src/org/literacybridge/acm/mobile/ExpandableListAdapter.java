@@ -1,5 +1,6 @@
 package org.literacybridge.acm.mobile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -15,13 +16,16 @@ import android.widget.TextView;
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
   private Context _context;
-  private List<ACMDatabaseInfo> listData; // Database names
+  private volatile List<ACMDatabaseInfo> listData = new ArrayList<ACMDatabaseInfo>(); // Database names
 
-  public ExpandableListAdapter(Context context, List<ACMDatabaseInfo> listData) {
+  public ExpandableListAdapter(Context context) {
     this._context = context;
-    this.listData = listData;
   }
 
+  public void setListData(List<ACMDatabaseInfo> listData) {
+    this.listData = new ArrayList<ACMDatabaseInfo>(listData);
+  }
+  
   @Override
   public Object getChild(int groupPosition, int childPosititon) {
     return this.listData.get(groupPosition).getDeviceImages()

@@ -86,15 +86,15 @@ public class ACMDatabaseInfo {
       return path;
     }
 
-    public Status getStatus() {
+    public synchronized Status getStatus() {
       return status;
     }
 
-    public void setStatus(Status status) {
+    public synchronized void setStatus(Status status) {
       this.status = status;
     }
 
-    public long getSizeInBytes() {
+    public synchronized long getSizeInBytes() {
       return sizeInBytes;
     }
 
