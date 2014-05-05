@@ -3,12 +3,9 @@ package org.literacybridge.acm.io;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.channels.FileChannel;
 import java.util.List;
 
 import android.util.Pair;
@@ -42,7 +39,7 @@ public class DiskUtils {
   public static void copy(File from, File to) throws IOException {
     if (from.isDirectory()) {
       if (!to.exists()) {
-        to.mkdirs();
+        runAsRoot("mkdir -p " + to.getAbsolutePath());
       }
       
       File[] subFiles = from.listFiles();
@@ -58,28 +55,10 @@ public class DiskUtils {
           return;
         }
   
-        to.delete();
+        runAsRoot("rm " + to.getAbsolutePath());
       }
   
-      if (!to.exists()) {
-        to.createNewFile();
-      }
-  
-      FileChannel source = null;
-      FileChannel destination = null;
-  
-      try {
-        source = new FileInputStream(to).getChannel();
-        destination = new FileOutputStream(from).getChannel();
-        destination.transferFrom(source, 0, source.size());
-      } finally {
-        if (source != null) {
-          source.close();
-        }
-        if (destination != null) {
-          destination.close();
-        }
-      }
+      runAsRoot("cp " + from.getAbsolutePath() + " " + to.getAbsolutePath());
     }
   }
 
