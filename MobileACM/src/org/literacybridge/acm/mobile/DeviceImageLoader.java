@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import org.literacybridge.acm.io.DiskUtils;
 
+import android.util.Log;
+
 public class DeviceImageLoader {
   private static volatile DeviceImageLoader singleton;
 
@@ -32,25 +34,26 @@ public class DeviceImageLoader {
   }
 
   public void copyImageToDevice(File source) throws IOException {
-    // First check if device is healthy
-    boolean healthy = DiskUtils.checkDisk(false);
+//    // First check if device is healthy
+//    boolean healthy = DiskUtils.checkDisk(false);
+//
+//    // Not healthy? Try formatting
+//    if (!healthy) {
+//      DiskUtils.formatDevice();
+//      healthy = DiskUtils.checkDisk(false);
+//    }
+//
+//    // Still not? Then try repairing with checkdisk
+//    if (!healthy) {
+//      healthy = DiskUtils.checkDisk(true);
+//    }
+//
+//    // Still not? Give up here.
+//    if (!healthy) {
+//      throw new IOException("The device appears to be corrupted.");
+//    }
 
-    // Not healthy? Try formatting
-    if (!healthy) {
-      DiskUtils.formatDevice();
-      healthy = DiskUtils.checkDisk(false);
-    }
-
-    // Still not? Then try repairing with checkdisk
-    if (!healthy) {
-      healthy = DiskUtils.checkDisk(true);
-    }
-
-    // Still not? Give up here.
-    if (!healthy) {
-      throw new IOException("The device appears to be corrupted.");
-    }
-
+    Log.d("HMPF", source + " -> " + new File(DiskUtils.TBMountDirectory));
     DiskUtils.copy(source, new File(DiskUtils.TBMountDirectory));
 
     // File deviceRoot = new File("/storage/UsbDriveA");

@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import android.util.Log;
 import android.util.Pair;
 
 public class DiskUtils {
@@ -42,6 +43,8 @@ public class DiskUtils {
         runAsRoot("mkdir -p " + to.getAbsolutePath());
       }
       
+      mountDisk();
+      
       File[] subFiles = from.listFiles();
       for (File f : subFiles) {
         copy(f, new File(to, f.getName()));
@@ -69,6 +72,11 @@ public class DiskUtils {
             + TBMountDirectory);
 
   }
+  
+
+  public static void mountDisk() throws IOException {
+    runAsRoot("mount -t vfat -o rw /dev/block/sda1 /data/media/0/usbStorage/sda1");
+  }
 
   public static boolean checkDisk(boolean repair) throws IOException {
     String repairParam = "n";
@@ -88,6 +96,7 @@ public class DiskUtils {
     Process p = Runtime.getRuntime().exec("su");
     DataOutputStream os = new DataOutputStream(p.getOutputStream());
     for (String tmpCmd : cmds) {
+      Log.d("ROOT", tmpCmd);
       os.writeBytes(tmpCmd + "\n");
     }
     os.writeBytes("exit\n");
