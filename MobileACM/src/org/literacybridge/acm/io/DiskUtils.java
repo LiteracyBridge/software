@@ -92,8 +92,11 @@ public class DiskUtils {
   }
 
   public static boolean checkDisk(boolean repair) throws IOException {
-    // TODO: use repair flag
-    return runAsRoot("/system/bin/fsck.exfat -R " + TBDevDirectory);
+    String repairParam = "n";
+    if (repair == true){
+      repairParam = "y";
+    }
+    return runAsRoot("/system/bin/fsck_msdos -" + repairParam + " " + TBDevDirectory);
   }
 
   public static void unmount() throws IOException {
