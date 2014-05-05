@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 public class OnlineImages extends FragmentActivity implements
     ActionBar.TabListener {
@@ -91,5 +93,29 @@ public class OnlineImages extends FragmentActivity implements
     // TODO Auto-generated method stub
 
   }
+  
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+    // action with ID action_refresh was selected
+    case R.id.action_sync:
+      Toast.makeText(this, "Sync selected", Toast.LENGTH_SHORT)
+          .show();
+      
+      // Recreate OnlineImages activity
+      this.recreate();
+      
+      break;
+    // action with ID action_settings was selected
+    case R.id.action_settings:
+      Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT)
+          .show();
+      break;
+    default:
+      break;
+    }
+
+    return true;
+  } 
 
 }
