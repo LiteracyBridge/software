@@ -3,16 +3,19 @@ package org.literacybridge.acm.io;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.channels.FileChannel;
 import java.util.List;
 
 import android.util.Pair;
 
 public class DiskUtils {
 
-  private final static String TBMountDirectory = "/data/media/0/usbStorage/sda1";
+  public final static String TBMountDirectory = "/data/media/0/usbStorage/sda1";
   private final static String TBDevDirectory = "/dev/block/sda1";
 
   /**
@@ -36,11 +39,48 @@ public class DiskUtils {
     }
   }
 
-  private static void copy(File from, File to) throws IOException {
-    if (to.exists()) {
-      throw new IOException("Target file already exists.");
+  public static void copy(File from, File to) throws IOException {
+    if (from.isDirectory()) {
+      if (!to.exists()) {
+        to.mkdirs();
+      }
+      
+      File[] subFiles = from.listFiles();
+      for (File f : subFiles) {
+        copy(f, new File(to, f.getName()));
+      }
+    } else {
+      
+      if (to.exists()) {
+        if (to.length() == from.length()
+            && to.lastModified() == from.lastModified()) {
+          // avoid copying - files are identical
+          return;
+        }
+  
+        to.delete();
+      }
+  
+      if (!to.exists()) {
+        to.createNewFile();
+      }
+  
+      FileChannel source = null;
+      FileChannel destination = null;
+  
+      try {
+        source = new FileInputStream(to).getChannel();
+        destination = new FileOutputStream(from).getChannel();
+        destination.transferFrom(source, 0, source.size());
+      } finally {
+        if (source != null) {
+          source.close();
+        }
+        if (destination != null) {
+          destination.close();
+        }
+      }
     }
-
   }
 
   public static void formatDevice() throws IOException {

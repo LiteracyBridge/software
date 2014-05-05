@@ -1,5 +1,6 @@
 package org.literacybridge.acm.mobile;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.literacybridge.acm.io.DiskUtils;
@@ -30,7 +31,7 @@ public class DeviceImageLoader {
 
   }
 
-  private void copyImageToDevice() throws IOException {
+  public void copyImageToDevice(File source) throws IOException {
     // First check if device is healthy
     boolean healthy = DiskUtils.checkDisk(false);
 
@@ -50,7 +51,7 @@ public class DeviceImageLoader {
       throw new IOException("The device appears to be corrupted.");
     }
 
-    // DiskUtils.rsync(source, targetPath);
+    DiskUtils.copyDir(source, new File(DiskUtils.TBMountDirectory));
 
     // File deviceRoot = new File("/storage/UsbDriveA");
     // File test = new File(deviceRoot, "test.txt");

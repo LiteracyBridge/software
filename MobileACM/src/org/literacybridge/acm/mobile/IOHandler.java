@@ -51,6 +51,9 @@ public class IOHandler {
     try {
       Entry entry = mApi.metadata(image.getPath(), 1000, null, true, null);
       store(context, entry, entry.path, localBaseDir);
+      // TODO: just testing, remove
+      DeviceImageLoader.getInstance().copyImageToDevice(localBaseDir);
+      
       image.setStatus(Status.Downloaded);
     } catch (DropboxException e) {
       image.setStatus(Status.FailedDownload);
