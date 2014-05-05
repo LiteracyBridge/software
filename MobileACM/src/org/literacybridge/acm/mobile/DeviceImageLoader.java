@@ -51,7 +51,7 @@ public class DeviceImageLoader {
       throw new IOException("The device appears to be corrupted.");
     }
 
-    DiskUtils.copyDir(source, new File(DiskUtils.TBMountDirectory));
+    DiskUtils.copy(source, new File(DiskUtils.TBMountDirectory));
 
     // File deviceRoot = new File("/storage/UsbDriveA");
     // File test = new File(deviceRoot, "test.txt");
