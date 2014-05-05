@@ -3,6 +3,7 @@
 
     <string name="app_name">Mobile TB Loader</string>
     <string name="action_settings">Settings</string>
+    <string name="action_sync">Sync data</string>
     <string name="hello_world">Hallo Simulator.</string>
     <string name="title_activity_online_images">Mobile TB Loader</string>
     <string name="title_item_list">Items</string>

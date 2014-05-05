@@ -29,6 +29,7 @@ public final class R {
     }
     public static final class id {
         public static final int action_settings=0x7f080014;
+        public static final int action_sync=0x7f080015;
         public static final int btnCheck=0x7f08000b;
         public static final int btnFormat=0x7f08000a;
         public static final int btnRefresh=0x7f080007;
@@ -67,11 +68,12 @@ public final class R {
     }
     public static final class string {
         public static final int action_settings=0x7f050001;
+        public static final int action_sync=0x7f050002;
         public static final int app_name=0x7f050000;
-        public static final int hello_world=0x7f050002;
-        public static final int title_activity_online_images=0x7f050003;
-        public static final int title_item_detail=0x7f050005;
-        public static final int title_item_list=0x7f050004;
+        public static final int hello_world=0x7f050003;
+        public static final int title_activity_online_images=0x7f050004;
+        public static final int title_item_detail=0x7f050006;
+        public static final int title_item_list=0x7f050005;
     }
     public static final class style {
         /** 
