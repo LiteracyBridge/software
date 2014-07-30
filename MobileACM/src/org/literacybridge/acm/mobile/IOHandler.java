@@ -52,7 +52,7 @@ public class IOHandler {
       Entry entry = mApi.metadata(image.getPath(), 1000, null, true, null);
       store(context, entry, entry.path, localBaseDir);
       // TODO: just testing, remove
-      DeviceImageLoader.getInstance().copyImageToDevice(localBaseDir);
+      DeviceImageLoader.getInstance().copyImageToDevice(context, localBaseDir);
       
       image.setStatus(Status.Downloaded);
     } catch (DropboxException e) {

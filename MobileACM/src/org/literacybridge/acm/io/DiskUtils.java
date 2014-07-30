@@ -8,28 +8,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
 
 public class DiskUtils {
-
-  public final static String TBMountDirectory = "/data/media/0/usbStorage/sda1";
   private final static String TBDevDirectory = "/dev/block/sda1";
-
-  /**
-   * Performs an "rsync", which means that this method will try to copy the
-   * current state of source to the target by making the least amount of
-   * IOOperations.
-   * 
-   * @param source
-   *          The source folder on the Phone's/Tablet's local storage.
-   * @param targetPath
-   *          Relative path on the connected external USB device.
-   */
-  public static void rsync(File source, String targetPath) throws IOException {
-
-  }
-
+  
   private static void copy(List<Pair<File, File>> filesToCopy)
       throws IOException {
     for (Pair<File, File> file : filesToCopy) {
@@ -42,8 +27,6 @@ public class DiskUtils {
       if (!to.exists()) {
         runAsRoot("mkdir -p " + to.getAbsolutePath());
       }
-      
-      mountDisk();
       
       File[] subFiles = from.listFiles();
       for (File f : subFiles) {
@@ -65,31 +48,52 @@ public class DiskUtils {
     }
   }
 
-  public static void formatDevice() throws IOException {
-    runAsRoot("mkdir" + TBMountDirectory, "/system/bin/umount "
-        + TBMountDirectory, "/system/xbin/mkfs.vfat -v " + TBDevDirectory,
+  public static void formatDevice(File dir) throws IOException {
+    runAsRoot("mkdir" + dir, "/system/bin/umount "
+        + dir, "/system/xbin/mkfs.vfat -v " + TBDevDirectory,
         "/system/bin/mount -t vfat -o rw " + TBDevDirectory + " "
-            + TBMountDirectory);
-
+            + dir);
   }
   
-
-  public static void mountDisk() throws IOException {
-    runAsRoot("mount -t vfat -o rw /dev/block/sda1 /data/media/0/usbStorage/sda1");
+  public static File mountUSBDisk(Context context) throws IOException {
+    File mntRootDir = new File(context.getFilesDir(), "mnt");
+    
+    File blockDevices = new File("/dev/block");
+    if (!blockDevices.exists()) {
+      return null;
+    }
+    
+    File[] devices = blockDevices.listFiles();
+    for (File device : devices) {
+      File mountPoint = new File(mntRootDir, device.getName());
+      if (!mountPoint.exists()) {
+        mountPoint.mkdirs();
+      } else {
+        // assume device is already mounted
+        return mountPoint;
+      }
+      
+      if (runAsRoot("mount -t vfat -o rw -o nosuid " + device.getAbsolutePath() + " " + mountPoint.getAbsolutePath())) {
+        // mount return code 0 - assume we successfully mounted this device if mountPoint exists
+        if (mountPoint.exists()) {
+          return mountPoint;
+        }
+      }
+    }
+    
+    return null;
   }
 
-  public static boolean checkDisk(boolean repair) throws IOException {
+  public static boolean checkDisk(File dir, boolean repair) throws IOException {
     String repairParam = "n";
     if (repair == true){
       repairParam = "y";
     }
-    return runAsRoot("/system/bin/fsck_msdos -" + repairParam + " " + TBDevDirectory);
+    return runAsRoot("/system/bin/fsck_msdos -" + repairParam + " " + dir);
   }
 
-  public static void unmount() throws IOException {
-
-    runAsRoot("/system/bin/umount " + TBMountDirectory);
-
+  public static void unmount(File mountPoint) throws IOException {
+    runAsRoot("/system/bin/umount " + mountPoint.getAbsolutePath());
   }
 
   public static boolean runAsRoot(String... cmds) throws IOException {

@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.literacybridge.acm.io.DiskUtils;
+import org.literacybridge.acm.io.TalkingBookDevice;
 
+import android.content.Context;
 import android.util.Log;
 
 public class DeviceImageLoader {
@@ -33,7 +35,7 @@ public class DeviceImageLoader {
 
   }
 
-  public void copyImageToDevice(File source) throws IOException {
+  public void copyImageToDevice(Context context, File source) throws IOException {
 //    // First check if device is healthy
 //    boolean healthy = DiskUtils.checkDisk(false);
 //
@@ -53,8 +55,9 @@ public class DeviceImageLoader {
 //      throw new IOException("The device appears to be corrupted.");
 //    }
 
-    Log.d("HMPF", source + " -> " + new File(DiskUtils.TBMountDirectory));
-    DiskUtils.copy(source, new File(DiskUtils.TBMountDirectory));
+    TalkingBookDevice device = TalkingBookDevice.getConnectedDevice(context);
+    Log.d("HMPF", source + " -> " + device.getRootDir());
+    DiskUtils.copy(source, device.getRootDir());
 
     // File deviceRoot = new File("/storage/UsbDriveA");
     // File test = new File(deviceRoot, "test.txt");
