@@ -26,8 +26,8 @@ public class DeviceImageLoader {
   public Result imageDevice() throws IOException {
     // copyStatsFromDevice();
     // DiskUtils.checkDisk();
-    DiskUtils.formatDevice();
-
+    //DiskUtils.formatDevice();
+    
     return Result.SUCCESS;
   }
 

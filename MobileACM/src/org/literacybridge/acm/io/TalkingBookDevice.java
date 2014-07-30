@@ -3,6 +3,8 @@ package org.literacybridge.acm.io;
 import java.io.File;
 import java.io.IOException;
 
+import org.literacybridge.acm.io.DiskUtils.MountPoint;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -34,9 +36,9 @@ public class TalkingBookDevice {
   }
   
   private static TalkingBookDevice mountDevice(Context context) throws IOException {
-    File mountPoint = DiskUtils.mountUSBDisk(context);
-    if (mountPoint != null && mountPoint.exists()) {
-      return new TalkingBookDevice(mountPoint);
+    MountPoint mountPoint = DiskUtils.mountUSBDisk(context);
+    if (mountPoint != null) {
+      return new TalkingBookDevice(mountPoint.devicePath, mountPoint.mountPoint);
     }
     
     return null;
@@ -45,7 +47,7 @@ public class TalkingBookDevice {
   private final File deviceDir;
   private final File mountPoint;
   
-  private TalkingBookDevice(File deviceDir, File mountPoint) {
+  public TalkingBookDevice(File deviceDir, File mountPoint) {
     this.deviceDir = deviceDir;
     this.mountPoint = mountPoint;
   }
@@ -58,7 +60,7 @@ public class TalkingBookDevice {
     return mountPoint;
   }
   
-  public file getDeviceDir() {
+  public File getDeviceDir() {
     return deviceDir;
   }
   

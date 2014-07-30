@@ -3,6 +3,7 @@ package org.literacybridge.acm.io;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -55,7 +56,7 @@ public class DiskUtils {
             + dir);
   }
   
-  public static File mountUSBDisk(Context context) throws IOException {
+  public static MountPoint mountUSBDisk(Context context) throws IOException {
     File mntRootDir = new File(context.getFilesDir(), "mnt");
     
     File blockDevices = new File("/dev/block");
@@ -63,20 +64,24 @@ public class DiskUtils {
       return null;
     }
     
-    File[] devices = blockDevices.listFiles();
+    File[] devices = blockDevices.listFiles(new FilenameFilter() {
+      @Override public boolean accept(File dir, String filename) {
+        return filename.toLowerCase().matches("sda\\d+");
+      }
+    });
     for (File device : devices) {
       File mountPoint = new File(mntRootDir, device.getName());
       if (!mountPoint.exists()) {
         mountPoint.mkdirs();
       } else {
         // assume device is already mounted
-        return mountPoint;
+        return new MountPoint(mountPoint, device);
       }
       
       if (runAsRoot("mount -t vfat -o rw -o nosuid " + device.getAbsolutePath() + " " + mountPoint.getAbsolutePath())) {
         // mount return code 0 - assume we successfully mounted this device if mountPoint exists
         if (mountPoint.exists()) {
-          return mountPoint;
+          return new MountPoint(mountPoint, device);
         }
       }
     }
@@ -125,4 +130,14 @@ public class DiskUtils {
       ;
   }
 
+  public static final class MountPoint {
+    public final File mountPoint;
+    public final File devicePath;
+    
+    private MountPoint(File mountPoint, File devicePath) {
+      this.mountPoint = mountPoint;
+      this.devicePath = devicePath;
+    }
+  }
+  
 }
