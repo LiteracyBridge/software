@@ -3,8 +3,6 @@ package org.literacybridge.acm.io;
 import java.io.File;
 import java.io.IOException;
 
-import org.literacybridge.acm.io.DiskUtils.MountPoint;
-
 import android.content.Context;
 import android.util.Log;
 
@@ -14,7 +12,7 @@ public class TalkingBookDevice {
   public static synchronized TalkingBookDevice getConnectedDevice(Context context) {
     if (mountedDevice == null) {
       try {
-        mountedDevice = mountDevice(context);
+        mountedDevice = findAndMountDevice(context);
       } catch (IOException e) {
         Log.d("TalkingBookDevice", "Exception while trying to mount TalkingBook.", e);
         return null;
@@ -35,20 +33,23 @@ public class TalkingBookDevice {
     return mountedDevice;
   }
   
-  private static TalkingBookDevice mountDevice(Context context) throws IOException {
-    MountPoint mountPoint = DiskUtils.mountUSBDisk(context);
-    if (mountPoint != null) {
-      return new TalkingBookDevice(mountPoint.devicePath, mountPoint.mountPoint);
+  private static TalkingBookDevice findAndMountDevice(Context context) throws IOException {
+    File[] connectedDevices = DiskUtils.findConnectedDisks(context);
+    for (File device : connectedDevices) {
+      File mountPoint = DiskUtils.mountUSBDisk(context, device);
+      if (mountPoint != null) {
+        return new TalkingBookDevice(device, mountPoint);        
+      }
     }
-    
+        
     return null;
   }
   
-  private final File deviceDir;
-  private final File mountPoint;
+  private final File devicePath;
+  private File mountPoint;
   
-  public TalkingBookDevice(File deviceDir, File mountPoint) {
-    this.deviceDir = deviceDir;
+  public TalkingBookDevice(File devicePath, File mountPoint) {
+    this.devicePath = devicePath;
     this.mountPoint = mountPoint;
   }
   
@@ -61,10 +62,18 @@ public class TalkingBookDevice {
   }
   
   public File getDeviceDir() {
-    return deviceDir;
+    return devicePath;
   }
   
   public void unmount() throws IOException {
     DiskUtils.unmount(mountPoint);
+  }
+  
+  public void mount(Context context) throws IOException {
+    mountPoint = DiskUtils.mountUSBDisk(context, devicePath);
+  }
+  
+  public void checkIntegrity(boolean repair) throws IOException {
+    DiskUtils.checkDisk(devicePath, repair);
   }
 }

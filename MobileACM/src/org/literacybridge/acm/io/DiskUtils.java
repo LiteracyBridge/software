@@ -49,16 +49,14 @@ public class DiskUtils {
     }
   }
 
-  public static void formatDevice(File dir) throws IOException {
-    runAsRoot("mkdir" + dir, "/system/bin/umount "
-        + dir, "/system/xbin/mkfs.vfat -v " + TBDevDirectory,
-        "/system/bin/mount -t vfat -o rw " + TBDevDirectory + " "
-            + dir);
+  public static void formatDevice(Context context, TalkingBookDevice device) throws IOException {
+    device.unmount();
+    runAsRoot("/system/xbin/mkfs.vfat -v " + device.getDeviceDir());
+    device.mount(context);
+
   }
   
-  public static MountPoint mountUSBDisk(Context context) throws IOException {
-    File mntRootDir = new File(context.getFilesDir(), "mnt");
-    
+  public static File[] findConnectedDisks(Context context) throws IOException {
     File blockDevices = new File("/dev/block");
     if (!blockDevices.exists()) {
       return null;
@@ -69,20 +67,25 @@ public class DiskUtils {
         return filename.toLowerCase().matches("sda\\d+");
       }
     });
-    for (File device : devices) {
-      File mountPoint = new File(mntRootDir, device.getName());
-      if (!mountPoint.exists()) {
-        mountPoint.mkdirs();
-      } else {
-        // assume device is already mounted
-        return new MountPoint(mountPoint, device);
-      }
-      
-      if (runAsRoot("mount -t vfat -o rw -o nosuid " + device.getAbsolutePath() + " " + mountPoint.getAbsolutePath())) {
-        // mount return code 0 - assume we successfully mounted this device if mountPoint exists
-        if (mountPoint.exists()) {
-          return new MountPoint(mountPoint, device);
-        }
+    
+    return devices;
+  }
+  
+  public static File mountUSBDisk(Context context, File devicePath) throws IOException {
+    File mntRootDir = new File(context.getFilesDir(), "mnt");
+
+    File mountPoint = new File(mntRootDir, devicePath.getName());
+    if (!mountPoint.exists()) {
+      mountPoint.mkdirs();
+    } else {
+      // assume device is already mounted
+      return mountPoint;
+    }
+    
+    if (runAsRoot("mount -t vfat -o rw -o nosuid " + devicePath.getAbsolutePath() + " " + mountPoint.getAbsolutePath())) {
+      // mount return code 0 - assume we successfully mounted this device if mountPoint exists
+      if (mountPoint.exists()) {
+        return mountPoint;
       }
     }
     
@@ -129,15 +132,4 @@ public class DiskUtils {
     while ((line = br.readLine()) != null)
       ;
   }
-
-  public static final class MountPoint {
-    public final File mountPoint;
-    public final File devicePath;
-    
-    private MountPoint(File mountPoint, File devicePath) {
-      this.mountPoint = mountPoint;
-      this.devicePath = devicePath;
-    }
-  }
-  
 }
