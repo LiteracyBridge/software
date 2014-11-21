@@ -59,16 +59,15 @@ public class DropboxClient extends Activity {
 
     checkAppKeySetup();
 
-    // Start the remote authentication
-    mApi.getSession().startAuthentication(DropboxClient.this);
-    // Get the metadata for a directory
-
-    // if (mLoggedIn) {
-    // logOut();
-    // }
-
-    // Display the proper UI state if logged in or not
-    setLoggedIn(mApi.getSession().isLinked());
+    if (session.getAccessTokenPair() != null) {
+      setLoggedIn(true);
+      init();
+    } else {
+      // Start the remote authentication
+      mApi.getSession().startAuthentication(DropboxClient.this);
+      // Get the metadata for a directory
+      setLoggedIn(mApi.getSession().isLinked());
+    }
   }
 
   @Override
@@ -103,24 +102,27 @@ public class DropboxClient extends Activity {
     }
 
     if (mLoggedIn) {
-      IOHandler.init(mApi);
-      IOHandler.getInstance().refresh();
-
-      List<ACMDatabaseInfo> dbs = IOHandler.getInstance().getDatabaseInfos();
-      for (ACMDatabaseInfo db : dbs) {
-        Log.d("michael", db.getName());
-        for (ACMDatabaseInfo.DeviceImage image : db.getDeviceImages()) {
-          Log.d("michael", "\t" + image.getName() + "  ->  " + image.getPath());
-
-        }
-      }
-
-      Intent intent = new Intent(this, OnlineImages.class);
-
-      // Start mobileACM activity
-      startActivity(intent);
-
+      init();
     }
+  }
+
+  private void init() {
+    IOHandler.init(mApi);
+    IOHandler.getInstance().refresh();
+
+    List<ACMDatabaseInfo> dbs = IOHandler.getInstance().getDatabaseInfos();
+    for (ACMDatabaseInfo db : dbs) {
+      Log.d("michael", db.getName());
+      for (ACMDatabaseInfo.DeviceImage image : db.getDeviceImages()) {
+        Log.d("michael", "\t" + image.getName() + "  ->  " + image.getPath());
+
+      }
+    }
+
+    Intent intent = new Intent(this, OnlineImages.class);
+
+    // Start mobileACM activity
+    startActivity(intent);
   }
 
   private void logOut() {
@@ -172,7 +174,7 @@ public class DropboxClient extends Activity {
    * Shows keeping the access keys returned from Trusted Authenticator in a
    * local store, rather than storing user name & password, and
    * re-authenticating each time (which is not to be done, ever).
-   * 
+   *
    * @return Array of [access_key, access_secret], or null if none stored
    */
   private String[] getKeys() {
