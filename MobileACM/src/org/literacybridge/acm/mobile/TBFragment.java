@@ -9,8 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class TBFragment extends Fragment {
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.Tracker;
 
+public class TBFragment extends Fragment {
+	
+  private Tracker tracker;
   Button formatButton;
 
   @Override
@@ -34,8 +40,22 @@ public class TBFragment extends Fragment {
       }
     });
 
+    // Set analytics
+    this.tracker = EasyTracker.getInstance(getActivity());
+    
     return rootView;
 
   }
 
+  
+  @Override
+  public void onResume() {
+
+      super.onResume();
+
+      //this.tracker.set(Fields.SCREEN_NAME, getClass().getSimpleName());
+      this.tracker.set(Fields.SCREEN_NAME, "TalkingBook_Screen");
+      this.tracker.send( MapBuilder.createAppView().build() );
+  }
+  
 }

@@ -5,9 +5,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.Tracker;
+
 
 public class QAFragment extends Fragment {
 
+	private Tracker tracker;
+	
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
@@ -33,10 +40,24 @@ public class QAFragment extends Fragment {
       // Add the fragment to the 'fragment_container' FrameLayout
       getActivity().getSupportFragmentManager().beginTransaction()
           .add(R.id.fragment_container, firstFragment).commit();
-    }
 
+      // Report analytics
+      this.tracker = EasyTracker.getInstance(getActivity());
+      
+    }
+    
     return rootView;
 
+  }
+  
+  @Override
+  public void onResume() {
+
+      super.onResume();
+
+      //this.tracker.set(Fields.SCREEN_NAME, getClass().getSimpleName());
+      this.tracker.set(Fields.SCREEN_NAME, "Library_Screen");
+      this.tracker.send( MapBuilder.createAppView().build() );
   }
 
 }
