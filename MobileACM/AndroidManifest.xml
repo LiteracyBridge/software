@@ -24,7 +24,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="org.literacybridge.acm.mobile.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name" 
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,6 +35,7 @@
         <activity
             android:name="org.literacybridge.acm.mobile.dropbox.DropboxClient"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:parentActivityName="org.literacybridge.acm.mobile.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -41,6 +43,7 @@
         </activity>
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
+            android:screenOrientation="portrait"
             android:configChanges="orientation|keyboard"
             android:launchMode="singleTask" >
             <intent-filter>
@@ -54,15 +57,18 @@
         </activity>
         <activity
             android:name="org.literacybridge.acm.mobile.OnlineImages"
-            android:label="@string/title_activity_online_images" >
+            android:label="@string/title_activity_online_images" 
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name="org.literacybridge.acm.mobile.ItemListActivity"
-            android:label="@string/title_item_list" >
+            android:label="@string/title_item_list" 
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name="org.literacybridge.acm.mobile.ItemDetailActivity"
             android:label="@string/title_item_detail"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ItemListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
