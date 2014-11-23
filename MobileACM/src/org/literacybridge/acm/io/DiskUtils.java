@@ -14,8 +14,6 @@ import android.util.Log;
 import android.util.Pair;
 
 public class DiskUtils {
-  private final static String TBDevDirectory = "/dev/block/sda1";
-  
   private static void copy(List<Pair<File, File>> filesToCopy)
       throws IOException {
     for (Pair<File, File> file : filesToCopy) {
@@ -28,23 +26,22 @@ public class DiskUtils {
       if (!to.exists()) {
         runAsRoot("mkdir -p " + to.getAbsolutePath());
       }
-      
+
       File[] subFiles = from.listFiles();
       for (File f : subFiles) {
         copy(f, new File(to, f.getName()));
       }
     } else {
-      
       if (to.exists()) {
         if (to.length() == from.length()
             && to.lastModified() == from.lastModified()) {
           // avoid copying - files are identical
           return;
         }
-  
+
         runAsRoot("rm " + to.getAbsolutePath());
       }
-  
+
       runAsRoot("cp " + from.getAbsolutePath() + " " + to.getAbsolutePath());
     }
   }
@@ -55,22 +52,22 @@ public class DiskUtils {
     device.mount(context);
 
   }
-  
+
   public static File[] findConnectedDisks(Context context) throws IOException {
     File blockDevices = new File("/dev/block");
     if (!blockDevices.exists()) {
       return null;
     }
-    
+
     File[] devices = blockDevices.listFiles(new FilenameFilter() {
       @Override public boolean accept(File dir, String filename) {
         return filename.toLowerCase().matches("sda\\d+");
       }
     });
-    
+
     return devices;
   }
-  
+
   public static File mountUSBDisk(Context context, File devicePath) throws IOException {
     File mntRootDir = new File(context.getFilesDir(), "mnt");
 
@@ -81,14 +78,14 @@ public class DiskUtils {
       // assume device is already mounted
       return mountPoint;
     }
-    
+
     if (runAsRoot("mount -t vfat -o rw -o nosuid " + devicePath.getAbsolutePath() + " " + mountPoint.getAbsolutePath())) {
       // mount return code 0 - assume we successfully mounted this device if mountPoint exists
       if (mountPoint.exists()) {
         return mountPoint;
       }
     }
-    
+
     return null;
   }
 

@@ -6,21 +6,41 @@
     android:background="#ffffff">
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/statusView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/btnFormat"
         android:layout_alignParentTop="true"
         android:layout_marginTop="30dp"
-        android:text="Connection status:"
+        android:text="Connection status: No TalkingBook mounted"
         android:textSize="16sp" />
 
+    <Button
+        android:id="@+id/btnMount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/statusView"
+        android:layout_marginLeft="29dp"
+        android:layout_marginTop="47dp"
+        android:text="Mount TalkingBook" />
+
+    <Button
+        android:id="@+id/btnUnmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/btnMount"
+        android:layout_marginLeft="29dp"
+        android:layout_marginTop="47dp"
+        android:text="Unmount TalkingBook" />
+    
     <Button
         android:id="@+id/btnFormat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@+id/btnUnmount"
         android:layout_marginLeft="29dp"
         android:layout_marginTop="47dp"
         android:text="Format SD card" />
