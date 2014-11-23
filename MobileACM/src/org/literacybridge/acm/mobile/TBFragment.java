@@ -14,6 +14,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.Tracker;
+
 public class TBFragment extends Fragment {
 
   private TextView status;
@@ -22,6 +27,7 @@ public class TBFragment extends Fragment {
   private Button unMountButton;
 
   private TalkingBookDevice mountedDevice = null;
+  private Tracker tracker;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,8 +88,22 @@ public class TBFragment extends Fragment {
       }
     });
 
+    // Set analytics
+    this.tracker = EasyTracker.getInstance(getActivity());
+
     return rootView;
 
+  }
+
+
+  @Override
+  public void onResume() {
+
+      super.onResume();
+
+      //this.tracker.set(Fields.SCREEN_NAME, getClass().getSimpleName());
+      this.tracker.set(Fields.SCREEN_NAME, "TalkingBook_Screen");
+      this.tracker.send( MapBuilder.createAppView().build() );
   }
 
 }

@@ -17,13 +17,17 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Tracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 
 public class OnlineFragment extends Fragment implements View.OnClickListener {
 
   ExpandableListAdapter listAdapter;
   ExpandableListView expListView;
   ConnectivityManager connMgr;
-  
+  private Tracker tracker;
 
   private Handler handler = new Handler();
 
@@ -43,6 +47,8 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
     
     handler.postDelayed(runnable, 1000);
 
+    this.tracker = EasyTracker.getInstance(getActivity());
+    
     return rootView;
 
   }
@@ -56,6 +62,8 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
     }
   };
 
+
+  
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
@@ -81,6 +89,8 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
 
       // Load device list including states
       this.loadDeviceList();
+      
+  		
 
     } else {
       Toast.makeText(getActivity().getApplicationContext(),
@@ -95,6 +105,10 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
   private void loadDeviceList() {
     
     progressBar.setVisibility(0);
+    
+	this.tracker.send(MapBuilder.createEvent("Image_clicked",
+			"Image_Downloaded", "Image_Selected", null).build());
+    
     new DownloadLibraryInfosTask().execute();
   }
 
@@ -111,6 +125,16 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
       this.loadDeviceList();
     }
 
+  }
+  
+  @Override
+  public void onResume() {
+
+      super.onResume();
+
+      //this.tracker.set(Fields.SCREEN_NAME, getClass().getSimpleName());
+      this.tracker.set(Fields.SCREEN_NAME, "Download_Screen");
+      this.tracker.send( MapBuilder.createAppView().build() );
   }
   
   private class DownloadLibraryInfosTask extends AsyncTask<Void, Void, List<ACMDatabaseInfo>> {
