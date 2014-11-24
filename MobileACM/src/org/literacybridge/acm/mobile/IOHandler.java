@@ -6,8 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.literacybridge.acm.mobile.ACMDatabaseInfo.DeviceImage.Status;
 
@@ -21,7 +22,7 @@ import com.dropbox.client2.exception.DropboxException;
 
 public class IOHandler {
   private final DropboxAPI<AndroidAuthSession> mApi;
-  private final List<ACMDatabaseInfo> databaseInfos;
+  private final Map<String, ACMDatabaseInfo> databaseInfos;
   private final File filesDir;
 
   private static volatile IOHandler singleton;
@@ -36,12 +37,12 @@ public class IOHandler {
 
   private IOHandler(DropboxAPI<AndroidAuthSession> mApi, File filesDir) {
     this.mApi = mApi;
-    this.databaseInfos = new ArrayList<ACMDatabaseInfo>();
+    this.databaseInfos = new HashMap<String, ACMDatabaseInfo>();
     this.filesDir = filesDir;
   }
 
   public List<ACMDatabaseInfo> getDatabaseInfos() {
-    return Collections.unmodifiableList(databaseInfos);
+    return new ArrayList<ACMDatabaseInfo>(databaseInfos.values());
   }
 
   public File getLocalDownloadPath(ACMDatabaseInfo.DeviceImage image) {
@@ -103,12 +104,18 @@ public class IOHandler {
       }
     } else {
       OutputStream out = null;
+      File successFile = getSuccessFile(file);
+      if (successFile.exists()) {
+        successFile.delete();
+      }
 
       try {
         out = new BufferedOutputStream(new FileOutputStream(file));
         mApi.getFile(entry.path, null, out, null);
         Log.d("michael",
             "downloaded " + entry.path + " to " + file.getAbsolutePath());
+
+        getSuccessFile(file).createNewFile();
       } finally {
         if (out != null) {
           try {
@@ -121,8 +128,38 @@ public class IOHandler {
     }
   }
 
+  private File getSuccessFile(File file) {
+    return new File(file.getParent(), file.getName() + ".success");
+  }
+
+  private void refreshLocal() {
+    Log.d("REFRESH", "Refreshing DB list from local disk.");
+
+    File databaseFolder = new File(filesDir, "tbloaders");
+    for (File db : databaseFolder.listFiles()) {
+      if (db.isDirectory() && db.getName().startsWith("ACM-")) {
+        ACMDatabaseInfo dbInfo = new ACMDatabaseInfo(db.getName());
+        for (File image : db.listFiles()) {
+          String imageName = image.getName();
+          ACMDatabaseInfo.DeviceImage deviceImage =
+              new ACMDatabaseInfo.DeviceImage(dbInfo, imageName, null, getSizeInBytes(image));
+          if (getSuccessFile(new File(image, "content-" + imageName + ".zip")).exists()) {
+            deviceImage.setStatus(Status.Downloaded);
+          } else {
+            deviceImage.setStatus(Status.FailedDownload);
+          }
+          dbInfo.addDeviceImage(deviceImage);
+        }
+        if (dbInfo.getDeviceImages().size() > 0 && !databaseInfos.containsKey(dbInfo.getName())) {
+          databaseInfos.put(dbInfo.getName(), dbInfo);
+        }
+      }
+    }
+  }
+
   public void refresh() {
     databaseInfos.clear();
+
     try {
       Entry dirent = mApi.metadata("/", 1000, null, true, null);
 
@@ -149,7 +186,7 @@ public class IOHandler {
                         new ACMDatabaseInfo.DeviceImage(dbInfo, imageName, zipFile.path, zipFile.bytes);
                     File localZipFile = new File(getLocalDownloadPath(deviceImage), zipFile.fileName());
                     if (localZipFile.exists()) {
-                      if (localZipFile.length() == zipFile.bytes) {
+                      if (getSuccessFile(localZipFile).exists()) {
                         deviceImage.setStatus(Status.Downloaded);
                       } else {
                         deviceImage.setStatus(Status.FailedDownload);
@@ -164,13 +201,18 @@ public class IOHandler {
                 }
               }
             }
-            databaseInfos.add(dbInfo);
+            if (dbInfo.getDeviceImages().size() > 0) {
+              databaseInfos.put(dbInfo.getName(), dbInfo);
+            }
           }
         }
       }
 
     } catch (DropboxException e) {
-      Log.d("Dropbox", "load", e);
+      Log.d("Dropbox", "Failed to load DBs from Dropbox.", e);
     }
+
+
+    refreshLocal();
   }
 }

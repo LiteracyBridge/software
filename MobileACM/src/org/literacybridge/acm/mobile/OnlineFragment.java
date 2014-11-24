@@ -23,7 +23,7 @@ import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.Tracker;
 
-public class OnlineFragment extends Fragment implements View.OnClickListener {
+public class OnlineFragment extends Fragment {
 
   ExpandableListAdapter listAdapter;
   ExpandableListView expListView;
@@ -43,7 +43,18 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
         .inflate(R.layout.fragment_online, container, false);
 
     refreshButton = (Button) rootView.findViewById(R.id.btnRefresh);
-    refreshButton.setOnClickListener(this);
+    refreshButton.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+          loadDeviceList();
+        } else {
+          Toast.makeText(getActivity().getApplicationContext(),
+              "No internet connectivity!", Toast.LENGTH_LONG).show();
+        }
+      }
+    });
+
     progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarLoading);
 
     handler.postDelayed(runnable, 1000);
@@ -83,49 +94,22 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
 
     NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-    if (networkInfo != null && networkInfo.isConnected()) {
-
-      // Hide Refresh button since network connectivity is available
-      refreshButton.setVisibility(View.GONE);
-
-      // Load device list including states
-      this.loadDeviceList();
-
-
-
-    } else {
+    if (networkInfo == null || !networkInfo.isConnected()) {
       Toast.makeText(getActivity().getApplicationContext(),
-          "No internet connectivity!", 1).show();
-
-      // Show Refresh button since network connectivity is available
-      refreshButton.setVisibility(0);
-
+          "No internet connectivity!", Toast.LENGTH_LONG).show();
     }
+
+    // Load device list including states
+    this.loadDeviceList();
   }
 
   private void loadDeviceList() {
-
     progressBar.setVisibility(0);
 
-	this.tracker.send(MapBuilder.createEvent("Image_clicked",
+    this.tracker.send(MapBuilder.createEvent("Image_clicked",
 			"Image_Downloaded", "Image_Selected", null).build());
 
     new DownloadLibraryInfosTask().execute();
-  }
-
-  @Override
-  public void onClick(View v) {
-    // Toast.makeText(
-    // getActivity().getApplicationContext(),"Button clicked",1).show();
-
-    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-
-    if (networkInfo != null && networkInfo.isConnected()) {
-
-      refreshButton.setVisibility(View.GONE);
-      this.loadDeviceList();
-    }
-
   }
 
   @Override

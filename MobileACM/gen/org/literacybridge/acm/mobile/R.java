@@ -21,6 +21,11 @@ public final class R {
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
 
+         Example customization of dimensions originally defined in res/values/dimens.xml
+         (such as screen margins) for screens with more than 820dp of available width. This
+         would include 7" and 10" devices in landscape (~960dp and ~1280dp respectively).
+    
+
          Customize dimensions originally defined in res/values/dimens.xml (such as
          screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
     
@@ -36,15 +41,16 @@ public final class R {
         public static final int ic_launcher=0x7f020004;
     }
     public static final class id {
+        public static final int action_debug=0x7f0a0017;
         public static final int action_settings=0x7f0a0015;
         public static final int action_sync=0x7f0a0016;
         public static final int btnCheck=0x7f0a000d;
         public static final int btnFormat=0x7f0a000a;
         public static final int btnMount=0x7f0a000b;
-        public static final int btnRefresh=0x7f0a0006;
+        public static final int btnRefresh=0x7f0a0005;
         public static final int btnStats=0x7f0a000e;
         public static final int btnUnmount=0x7f0a000c;
-        public static final int expListView=0x7f0a0005;
+        public static final int expListView=0x7f0a0006;
         public static final int fragment_container=0x7f0a0008;
         public static final int frameLayout=0x7f0a0004;
         public static final int imgListItem=0x7f0a0012;
@@ -66,29 +72,32 @@ public final class R {
         public static final int ga_dispatchPeriod=0x7f050000;
     }
     public static final class layout {
-        public static final int activity_main=0x7f030000;
-        public static final int activity_online_images=0x7f030001;
-        public static final int fragment_library=0x7f030002;
-        public static final int fragment_online=0x7f030003;
-        public static final int fragment_qa=0x7f030004;
-        public static final int fragment_talkingbook=0x7f030005;
-        public static final int list_group=0x7f030006;
-        public static final int list_item=0x7f030007;
-        public static final int simple_list_item=0x7f030008;
+        public static final int activity_debug=0x7f030000;
+        public static final int activity_main=0x7f030001;
+        public static final int activity_online_images=0x7f030002;
+        public static final int fragment_library=0x7f030003;
+        public static final int fragment_online=0x7f030004;
+        public static final int fragment_qa=0x7f030005;
+        public static final int fragment_talkingbook=0x7f030006;
+        public static final int list_group=0x7f030007;
+        public static final int list_item=0x7f030008;
+        public static final int simple_list_item=0x7f030009;
     }
     public static final class menu {
         public static final int main=0x7f090000;
         public static final int online_images=0x7f090001;
     }
     public static final class string {
+        public static final int action_debug=0x7f040004;
         public static final int action_settings=0x7f040002;
         public static final int action_sync=0x7f040003;
         public static final int app_name=0x7f040001;
         public static final int ga_trackingId=0x7f040000;
-        public static final int hello_world=0x7f040004;
-        public static final int title_activity_online_images=0x7f040005;
-        public static final int title_item_detail=0x7f040007;
-        public static final int title_item_list=0x7f040006;
+        public static final int hello_world=0x7f040005;
+        public static final int title_activity_debug=0x7f040009;
+        public static final int title_activity_online_images=0x7f040006;
+        public static final int title_item_detail=0x7f040008;
+        public static final int title_item_list=0x7f040007;
     }
     public static final class style {
         /** 
