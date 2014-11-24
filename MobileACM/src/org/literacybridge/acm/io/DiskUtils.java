@@ -72,11 +72,14 @@ public class DiskUtils {
     File mntRootDir = new File(context.getFilesDir(), "mnt");
 
     File mountPoint = new File(mntRootDir, devicePath.getName());
-    if (!mountPoint.exists()) {
-      mountPoint.mkdirs();
+    if (mountPoint.exists()) {
+      String[] files = mountPoint.list();
+      if (files != null && files.length > 0) {
+        // assume it's already mounted
+        return mountPoint;
+      }
     } else {
-      // assume device is already mounted
-      return mountPoint;
+      mountPoint.mkdirs();
     }
 
     if (runAsRoot("mount -t vfat -o rw -o nosuid " + devicePath.getAbsolutePath() + " " + mountPoint.getAbsolutePath())) {

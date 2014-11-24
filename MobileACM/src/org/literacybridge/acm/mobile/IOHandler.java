@@ -43,17 +43,20 @@ public class IOHandler {
   }
 
   public void store(Context context, ACMDatabaseInfo.DeviceImage image) {
-    final String localBasePath = "dbs/" + image.getDatabaseInfo().getName()
+    final String localBasePath = "tbloaders/" + image.getDatabaseInfo().getName()
         + "/" + image.getName();
     File localBaseDir = new File(context.getFilesDir(), localBasePath);
+    boolean success = localBaseDir.exists() || localBaseDir.mkdirs();
+    if (!success) {
+      image.setStatus(Status.FailedDownload);
+      Log.d("download", "Failed to create directory " + localBaseDir.getAbsolutePath());
+      return;
+    }
     image.setStatus(Status.Downloading);
 
     try {
       Entry entry = mApi.metadata(image.getPath(), 1000, null, true, null);
-      store(context, entry, entry.path, localBaseDir);
-      // TODO: just testing, remove
-      DeviceImageLoader.getInstance().copyImageToDevice(context, localBaseDir);
-      
+      store(context, entry, localBaseDir);
       image.setStatus(Status.Downloaded);
     } catch (DropboxException e) {
       image.setStatus(Status.FailedDownload);
@@ -64,19 +67,17 @@ public class IOHandler {
     }
   }
 
-  private void store(Context context, Entry entry, String dropboxBasePath,
-      File localBasePath) throws DropboxException, IOException {
+  private void store(Context context, Entry entry, File localDir) throws DropboxException, IOException {
     Log.d("michael", "store " + entry.path);
 
-    String relativePath = entry.path.substring(dropboxBasePath.length());
-    File file = new File(localBasePath, relativePath);
+    File file = new File(localDir, entry.fileName());
 
     if (entry.isDir) {
       Log.d("michael", "store dir " + entry.path);
       file.mkdirs();
       for (Entry ent : entry.contents) {
         Entry sub = mApi.metadata(ent.path, 1000, null, true, null);
-        store(context, sub, dropboxBasePath, localBasePath);
+        store(context, sub, file);
       }
     } else {
       OutputStream out = null;
@@ -104,25 +105,33 @@ public class IOHandler {
       Entry dirent = mApi.metadata("/", 1000, null, true, null);
 
       for (Entry ent : dirent.contents) {
-        if (ent.isDir) {
-          Entry sub = mApi.metadata(ent.path, 1000, null, true, null);
-          for (Entry ent1 : sub.contents) {
-            if (ent1.fileName().equals("accessList.txt")) {
-              ACMDatabaseInfo dbInfo = new ACMDatabaseInfo(ent.fileName());
-              Log.d("michael", "ent.path=" + ent.path);
-              String tbLoadersPath = ent.path + "/TB-Loaders/active";
-              try {
-                Entry images = mApi.metadata(tbLoadersPath, 1000, null, true,
-                    null);
-                for (Entry image : images.contents) {
-                  dbInfo.addDeviceImage(new ACMDatabaseInfo.DeviceImage(dbInfo,
-                      image.fileName(), image.path));
+        if (ent.isDir && ent.fileName().startsWith("ACM-")) {
+          ACMDatabaseInfo dbInfo = new ACMDatabaseInfo(ent.fileName());
+          String tbLoadersPath = ent.path + "/TB-Loaders";
+          Entry tbloaderDir = null;
+          try {
+            tbloaderDir = mApi.metadata(tbLoadersPath, 1000, null, true, null);
+          } catch (DropboxException e) {
+            // skip this folder
+          }
+          if (tbloaderDir != null) {
+            for (Entry file : tbloaderDir.contents) {
+              if (file.fileName().endsWith(".rev")) {
+                Log.d("Dropbox", "Found " + file.fileName());
+                String imageName = file.fileName().substring(0, file.fileName().length() - 4);
+                String zipFilePath = tbloaderDir.path + "/content-" + imageName + ".zip";
+                try {
+                  Entry zipFile = mApi.metadata(zipFilePath, 1000, null, true, null);
+                  if (zipFile != null) {
+                    dbInfo.addDeviceImage(new ACMDatabaseInfo.DeviceImage(dbInfo,
+                        imageName, zipFile.path, zipFile.bytes));
+                  }
+                } catch (DropboxException e) {
+                  // ignore this image
                 }
-                databaseInfos.add(dbInfo);
-              } catch (DropboxException e) {
-                // ignore
               }
             }
+            databaseInfos.add(dbInfo);
           }
         }
       }
