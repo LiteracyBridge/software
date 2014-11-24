@@ -103,10 +103,8 @@ public class OnlineImages extends FragmentActivity implements
       Toast.makeText(this, "Sync selected", Toast.LENGTH_SHORT)
           .show();
       
-      // Recreate OnlineImages activity
-      this.recreate();
-      
-      break;
+      throw new RuntimeException("This is a crash");
+            
       
     case R.id.action_debug:
     	Intent myIntent = new Intent(this, DebugActivity.class);

@@ -10,6 +10,7 @@
     <string name="title_item_list">Items</string>
     <string name="title_item_detail">Item Detail</string>
     <string name="title_activity_debug">Debug Menu</string>
+    <string name="crash_toast_text">Mobile Talking Book Loader app just crashed. The crash reports were sent to the developer team for further analysis.</string>
     
 
 </resources>
