@@ -22,30 +22,52 @@ import com.dropbox.client2.exception.DropboxException;
 public class IOHandler {
   private final DropboxAPI<AndroidAuthSession> mApi;
   private final List<ACMDatabaseInfo> databaseInfos;
+  private final File filesDir;
 
   private static volatile IOHandler singleton;
 
-  public static synchronized void init(DropboxAPI<AndroidAuthSession> mApi) {
-    singleton = new IOHandler(mApi);
+  public static synchronized void init(DropboxAPI<AndroidAuthSession> mApi, Context context) {
+    singleton = new IOHandler(mApi, context.getFilesDir());
   }
 
   public static synchronized IOHandler getInstance() {
     return singleton;
   }
 
-  public IOHandler(DropboxAPI<AndroidAuthSession> mApi) {
+  private IOHandler(DropboxAPI<AndroidAuthSession> mApi, File filesDir) {
     this.mApi = mApi;
     this.databaseInfos = new ArrayList<ACMDatabaseInfo>();
+    this.filesDir = filesDir;
   }
 
   public List<ACMDatabaseInfo> getDatabaseInfos() {
     return Collections.unmodifiableList(databaseInfos);
   }
 
-  public void store(Context context, ACMDatabaseInfo.DeviceImage image) {
+  public File getLocalDownloadPath(ACMDatabaseInfo.DeviceImage image) {
     final String localBasePath = "tbloaders/" + image.getDatabaseInfo().getName()
         + "/" + image.getName();
-    File localBaseDir = new File(context.getFilesDir(), localBasePath);
+    return new File(filesDir, localBasePath);
+  }
+
+  public long getDownloadedSizeInBytes(ACMDatabaseInfo.DeviceImage image) {
+    return getSizeInBytes(getLocalDownloadPath(image));
+  }
+
+  private static long getSizeInBytes(File file) {
+    if (file.isDirectory()) {
+      long sum = 0;
+      for (File f : file.listFiles()) {
+        sum += getSizeInBytes(f);
+      }
+      return sum;
+    }
+
+    return file.length();
+  }
+
+  public void store(ACMDatabaseInfo.DeviceImage image) {
+    File localBaseDir = getLocalDownloadPath(image);
     boolean success = localBaseDir.exists() || localBaseDir.mkdirs();
     if (!success) {
       image.setStatus(Status.FailedDownload);
@@ -56,7 +78,7 @@ public class IOHandler {
 
     try {
       Entry entry = mApi.metadata(image.getPath(), 1000, null, true, null);
-      store(context, entry, localBaseDir);
+      store(entry, localBaseDir);
       image.setStatus(Status.Downloaded);
     } catch (DropboxException e) {
       image.setStatus(Status.FailedDownload);
@@ -67,7 +89,7 @@ public class IOHandler {
     }
   }
 
-  private void store(Context context, Entry entry, File localDir) throws DropboxException, IOException {
+  private void store(Entry entry, File localDir) throws DropboxException, IOException {
     Log.d("michael", "store " + entry.path);
 
     File file = new File(localDir, entry.fileName());
@@ -77,7 +99,7 @@ public class IOHandler {
       file.mkdirs();
       for (Entry ent : entry.contents) {
         Entry sub = mApi.metadata(ent.path, 1000, null, true, null);
-        store(context, sub, file);
+        store(sub, file);
       }
     } else {
       OutputStream out = null;
@@ -123,8 +145,19 @@ public class IOHandler {
                 try {
                   Entry zipFile = mApi.metadata(zipFilePath, 1000, null, true, null);
                   if (zipFile != null) {
-                    dbInfo.addDeviceImage(new ACMDatabaseInfo.DeviceImage(dbInfo,
-                        imageName, zipFile.path, zipFile.bytes));
+                    ACMDatabaseInfo.DeviceImage deviceImage =
+                        new ACMDatabaseInfo.DeviceImage(dbInfo, imageName, zipFile.path, zipFile.bytes);
+                    File localZipFile = new File(getLocalDownloadPath(deviceImage), zipFile.fileName());
+                    if (localZipFile.exists()) {
+                      if (localZipFile.length() == zipFile.bytes) {
+                        deviceImage.setStatus(Status.Downloaded);
+                      } else {
+                        deviceImage.setStatus(Status.FailedDownload);
+                      }
+                    } else {
+                      deviceImage.setStatus(Status.NotDownloaded);
+                    }
+                    dbInfo.addDeviceImage(deviceImage);
                   }
                 } catch (DropboxException e) {
                   // ignore this image
