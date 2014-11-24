@@ -25,7 +25,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
   public void setListData(List<ACMDatabaseInfo> listData) {
     this.listData = new ArrayList<ACMDatabaseInfo>(listData);
   }
-  
+
   @Override
   public Object getChild(int groupPosition, int childPosititon) {
     return this.listData.get(groupPosition).getDeviceImages()
@@ -64,26 +64,20 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     ProgressBar proProgress = (ProgressBar) convertView
         .findViewById(R.id.progressBar1);
 
-    TextView txtStatus = (TextView) convertView.findViewById(R.id.lblStatus);
-
     TextView txtSize = (TextView) convertView.findViewById(R.id.lblSize);
 
     txtListChild.setText(imageName);
 
-    txtSize.setText(convertSize(child.getSizeInBytes()));
-
-    /*
-     * // Set dummy values if (childPosition == 0) { StateName = "Downloaded"; }
-     * else if (childPosition == 1) { StateName = "NotDownloaded"; } else if
-     * (childPosition == 4) { StateName = "Downloading"; } else if
-     * (childPosition == 2) { StateName = "FailedDownload"; }
-     */
+    txtSize.setText("Size: " + convertSize(child.getTotalSizeInBytes()));
 
     if (StateName.equals("Downloaded")) {
       proProgress.setVisibility(View.GONE);
       imgListView.setVisibility(0); // To set visible
       imgListView.setImageResource(R.drawable.download);
     } else if (StateName.equals("Downloading")) {
+      long downloadedSize = IOHandler.getInstance().getDownloadedSizeInBytes(child);
+      txtSize.setText("Downloaded " + convertSize(downloadedSize)
+          + " of " + convertSize(child.getTotalSizeInBytes()));
       proProgress.setVisibility(0);
       imgListView.setVisibility(View.GONE);
     } else if (StateName.equals("NotDownloaded")) {
@@ -161,7 +155,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
       retSize = sizeInBytes + " B";
     }
 
-    return "Size: " + retSize;
+    return retSize;
   }
 
 }

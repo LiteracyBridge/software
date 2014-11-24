@@ -41,7 +41,7 @@ public class ACMDatabaseInfo {
     List<String> listNames = new ArrayList<String>();
     for (DeviceImage img : deviceImages) {
       listNames.add(img.getName() + "," + img.getStatus() + ","
-          + img.getSizeInBytes());
+          + img.getTotalSizeInBytes());
     }
 
     return listNames;
@@ -94,7 +94,7 @@ public class ACMDatabaseInfo {
       this.status = status;
     }
 
-    public synchronized long getSizeInBytes() {
+    public synchronized long getTotalSizeInBytes() {
       return sizeInBytes;
     }
 

@@ -14,14 +14,6 @@
         android:textSize="17dip" />
 
     <TextView
-        android:id="@+id/lblStatus"
-        android:layout_width="110dp"
-        android:layout_height="50dp"
-        android:layout_alignParentRight="true"
-        android:paddingTop="17dp"
-        android:textSize="12dip" />
-
-    <TextView
         android:id="@+id/lblSize"
         android:layout_width="224dp"
         android:layout_height="wrap_content"
@@ -31,21 +23,21 @@
     
     
     <ImageView 
-    android:id="@+id/imgListItem"
-    android:layout_width="50dp"
-    android:layout_height="50dp"   
-    android:paddingTop="2dp"
-    android:layout_alignParentRight="true"
-    android:contentDescription="group image"
-    android:src="@drawable/download"
-    android:visibility="invisible"/>
+	    android:id="@+id/imgListItem"
+	    android:layout_width="50dp"
+	    android:layout_height="50dp"   
+	    android:paddingTop="2dp"
+	    android:layout_alignParentRight="true"
+	    android:contentDescription="group image"
+	    android:src="@drawable/download"
+	    android:visibility="invisible"/>
 
     
     <ProgressBar
         android:id="@+id/progressBar1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/lblStatus"
+        android:layout_alignBottom="@+id/lblSize"
         android:layout_alignParentRight="true"
         android:visibility="invisible" />
     

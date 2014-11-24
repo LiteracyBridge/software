@@ -107,7 +107,7 @@ public class DropboxClient extends Activity {
   }
 
   private void init() {
-    IOHandler.init(mApi);
+    IOHandler.init(mApi, getApplicationContext());
     IOHandler.getInstance().refresh();
 
     List<ACMDatabaseInfo> dbs = IOHandler.getInstance().getDatabaseInfos();

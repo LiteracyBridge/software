@@ -17,10 +17,11 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 import com.google.analytics.tracking.android.EasyTracker;
-import com.google.analytics.tracking.android.Tracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.Tracker;
 
 public class OnlineFragment extends Fragment implements View.OnClickListener {
 
@@ -44,11 +45,11 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
     refreshButton = (Button) rootView.findViewById(R.id.btnRefresh);
     refreshButton.setOnClickListener(this);
     progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarLoading);
-    
+
     handler.postDelayed(runnable, 1000);
 
     this.tracker = EasyTracker.getInstance(getActivity());
-    
+
     return rootView;
 
   }
@@ -63,7 +64,7 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
   };
 
 
-  
+
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
@@ -76,7 +77,7 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
 
     // setting list adapter
     expListView.setAdapter(listAdapter);
-    
+
     connMgr = (ConnectivityManager) getActivity().getSystemService(
         Context.CONNECTIVITY_SERVICE);
 
@@ -89,8 +90,8 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
 
       // Load device list including states
       this.loadDeviceList();
-      
-  		
+
+
 
     } else {
       Toast.makeText(getActivity().getApplicationContext(),
@@ -103,12 +104,12 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
   }
 
   private void loadDeviceList() {
-    
+
     progressBar.setVisibility(0);
-    
+
 	this.tracker.send(MapBuilder.createEvent("Image_clicked",
 			"Image_Downloaded", "Image_Selected", null).build());
-    
+
     new DownloadLibraryInfosTask().execute();
   }
 
@@ -126,7 +127,7 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
     }
 
   }
-  
+
   @Override
   public void onResume() {
 
@@ -136,7 +137,7 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
       this.tracker.set(Fields.SCREEN_NAME, "Download_Screen");
       this.tracker.send( MapBuilder.createAppView().build() );
   }
-  
+
   private class DownloadLibraryInfosTask extends AsyncTask<Void, Void, List<ACMDatabaseInfo>> {
     /** The system calls this to perform work in a worker thread and
       * delivers it the parameters given to AsyncTask.execute() */
@@ -145,13 +146,13 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
       IOHandler.getInstance().refresh();
       return IOHandler.getInstance().getDatabaseInfos();
     }
-    
+
     /** The system calls this to perform work in the UI thread and delivers
       * the result from doInBackground() */
     @Override
     protected void onPostExecute(final List<ACMDatabaseInfo> result) {
       listAdapter.setListData(result);
-      
+
       expListView.setOnChildClickListener(new OnChildClickListener() {
         @Override
         public boolean onChildClick(ExpandableListView parent, View v,
@@ -159,19 +160,17 @@ public class OnlineFragment extends Fragment implements View.OnClickListener {
 
           final ACMDatabaseInfo.DeviceImage image = result.get(groupPosition)
               .getDeviceImages().get(childPosition);
-          new Thread(new Runnable() {            
+          new Thread(new Runnable() {
             @Override public void run() {
-              IOHandler.getInstance().store(getActivity().getBaseContext(), image);
+              IOHandler.getInstance().store(image);
             }
-          }).start();;
+          }).start();
 
-          
-          
           return false;
         }
 
       });
-      
+
       listAdapter.notifyDataSetChanged();
       progressBar.setVisibility(View.GONE);
     }
