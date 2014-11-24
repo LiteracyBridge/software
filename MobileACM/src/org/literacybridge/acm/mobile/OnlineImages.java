@@ -5,6 +5,7 @@ import org.literacybridge.acm.mobile.adapter.TabsPagerAdapter;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -106,6 +107,12 @@ public class OnlineImages extends FragmentActivity implements
       this.recreate();
       
       break;
+      
+    case R.id.action_debug:
+    	Intent myIntent = new Intent(this, DebugActivity.class);
+    	this.startActivity(myIntent);
+    	break;
+      
     // action with ID action_settings was selected
     case R.id.action_settings:
       Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT)

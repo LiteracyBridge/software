@@ -8,24 +8,23 @@
         android:minSdkVersion="11"
         android:targetSdkVersion="17" />
 
-    <uses-permission android:name="android.permission.INTERNET" />    
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
-    
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/app_icon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="org.literacybridge.acm.mobile.MainActivity"
-            android:label="@string/app_name" 
-            android:screenOrientation="portrait">
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,19 +32,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.literacybridge.acm.mobile.dropbox.DropboxClient"
+            android:name=".dropbox.DropboxClient"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:parentActivityName="org.literacybridge.acm.mobile.MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.literacybridge.acm.mobile.MainActivity" />
         </activity>
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
-            android:screenOrientation="portrait"
             android:configChanges="orientation|keyboard"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <data android:scheme="db-oxb43a3l17014fp" />
 
@@ -56,23 +55,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.literacybridge.acm.mobile.OnlineImages"
-            android:label="@string/title_activity_online_images" 
-            android:screenOrientation="portrait">
+            android:name=".OnlineImages"
+            android:label="@string/title_activity_online_images"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="org.literacybridge.acm.mobile.ItemListActivity"
-            android:label="@string/title_item_list" 
-            android:screenOrientation="portrait">
+            android:name=".ItemListActivity"
+            android:label="@string/title_item_list"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="org.literacybridge.acm.mobile.ItemDetailActivity"
+            android:name=".ItemDetailActivity"
             android:label="@string/title_item_detail"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".ItemListActivity" >
+            android:parentActivityName=".ItemListActivity"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ItemListActivity" />
+        </activity>
+        <activity
+            android:name=".DebugActivity"
+            android:label="@string/title_activity_debug" >
         </activity>
     </application>
 
