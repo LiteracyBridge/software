@@ -2,6 +2,7 @@ package org.literacybridge.acm.mobile;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,7 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.literacybridge.acm.mobile.ACMDatabaseInfo.DeviceImage.Status;
+import org.literacybridge.acm.io.DiskUtils;
+import org.literacybridge.acm.mobile.ACMDatabaseInfo.DeploymentPackage.Status;
 
 import android.content.Context;
 import android.util.Log;
@@ -45,14 +47,18 @@ public class IOHandler {
     return new ArrayList<ACMDatabaseInfo>(databaseInfos.values());
   }
 
-  public File getLocalDownloadPath(ACMDatabaseInfo.DeviceImage image) {
-    final String localBasePath = "tbloaders/" + image.getDatabaseInfo().getName()
-        + "/" + image.getName();
+  public File getLocalDownloadPath(ACMDatabaseInfo.DeploymentPackage image) {
+    return getLocalDownloadPath(image.getDatabaseInfo().getName(), image.getName());
+  }
+
+  public File getLocalDownloadPath(String databaseName, String imageName) {
+    final String localBasePath = "tbloaders/" + databaseName
+        + "/" + imageName;
     return new File(filesDir, localBasePath);
   }
 
-  public long getDownloadedSizeInBytes(ACMDatabaseInfo.DeviceImage image) {
-    return getSizeInBytes(getLocalDownloadPath(image));
+  public long getDownloadedSizeInBytes(ACMDatabaseInfo.DeploymentPackage image) {
+    return getSizeInBytes(image.getLocalZipFile());
   }
 
   private static long getSizeInBytes(File file) {
@@ -67,7 +73,7 @@ public class IOHandler {
     return file.length();
   }
 
-  public void store(ACMDatabaseInfo.DeviceImage image) {
+  public void store(ACMDatabaseInfo.DeploymentPackage image) {
     File localBaseDir = getLocalDownloadPath(image);
     boolean success = localBaseDir.exists() || localBaseDir.mkdirs();
     if (!success) {
@@ -78,8 +84,10 @@ public class IOHandler {
     image.setStatus(Status.Downloading);
 
     try {
-      Entry entry = mApi.metadata(image.getPath(), 1000, null, true, null);
+      Entry entry = mApi.metadata(image.getZipFileDropBoxPath(), 1000, null, true, null);
       store(entry, localBaseDir);
+      unzipContentFile(image);
+      getSuccessFile(image.getLocalZipFile()).createNewFile();
       image.setStatus(Status.Downloaded);
     } catch (DropboxException e) {
       image.setStatus(Status.FailedDownload);
@@ -87,6 +95,16 @@ public class IOHandler {
     } catch (IOException e) {
       image.setStatus(Status.FailedDownload);
       Log.d("download", "Failed", e);
+    }
+  }
+
+  private void unzipContentFile(ACMDatabaseInfo.DeploymentPackage image) throws IOException {
+    if (!image.getLocalZipFile().exists()) {
+      throw new FileNotFoundException(image.getLocalZipFile().getAbsolutePath());
+    }
+    DiskUtils.unzip(image.getLocalZipFile());
+    if (!image.getLocalContentFolder().exists() || !image.getLocalContentFolder().isDirectory()) {
+      throw new IOException("Failed to unzip content file for image " + image);
     }
   }
 
@@ -114,8 +132,6 @@ public class IOHandler {
         mApi.getFile(entry.path, null, out, null);
         Log.d("michael",
             "downloaded " + entry.path + " to " + file.getAbsolutePath());
-
-        getSuccessFile(file).createNewFile();
       } finally {
         if (out != null) {
           try {
@@ -136,22 +152,27 @@ public class IOHandler {
     Log.d("REFRESH", "Refreshing DB list from local disk.");
 
     File databaseFolder = new File(filesDir, "tbloaders");
-    for (File db : databaseFolder.listFiles()) {
-      if (db.isDirectory() && db.getName().startsWith("ACM-")) {
-        ACMDatabaseInfo dbInfo = new ACMDatabaseInfo(db.getName());
-        for (File image : db.listFiles()) {
-          String imageName = image.getName();
-          ACMDatabaseInfo.DeviceImage deviceImage =
-              new ACMDatabaseInfo.DeviceImage(dbInfo, imageName, null, getSizeInBytes(image));
-          if (getSuccessFile(new File(image, "content-" + imageName + ".zip")).exists()) {
-            deviceImage.setStatus(Status.Downloaded);
-          } else {
-            deviceImage.setStatus(Status.FailedDownload);
+    if (databaseFolder.exists()) {
+      File[] files = databaseFolder.listFiles();
+      if (files != null) {
+        for (File db : files) {
+          if (db.isDirectory() && ACMDatabaseInfo.isACMDatabaseFolder(db.getName())) {
+            ACMDatabaseInfo dbInfo = new ACMDatabaseInfo(db.getName());
+            for (File image : db.listFiles()) {
+              String imageName = image.getName();
+              ACMDatabaseInfo.DeploymentPackage deviceImage =
+                  new ACMDatabaseInfo.DeploymentPackage(dbInfo, imageName, getSizeInBytes(image), image);
+              if (getSuccessFile(new File(image, ACMDatabaseInfo.DeploymentPackage.getZipFileName(imageName))).exists()) {
+                deviceImage.setStatus(Status.Downloaded);
+              } else {
+                deviceImage.setStatus(Status.FailedDownload);
+              }
+              dbInfo.addDeviceImage(deviceImage);
+            }
+            if (dbInfo.getDeviceImages().size() > 0 && !databaseInfos.containsKey(dbInfo.getName())) {
+              databaseInfos.put(dbInfo.getName(), dbInfo);
+            }
           }
-          dbInfo.addDeviceImage(deviceImage);
-        }
-        if (dbInfo.getDeviceImages().size() > 0 && !databaseInfos.containsKey(dbInfo.getName())) {
-          databaseInfos.put(dbInfo.getName(), dbInfo);
         }
       }
     }
@@ -164,12 +185,11 @@ public class IOHandler {
       Entry dirent = mApi.metadata("/", 1000, null, true, null);
 
       for (Entry ent : dirent.contents) {
-        if (ent.isDir && ent.fileName().startsWith("ACM-")) {
+        if (ent.isDir && ACMDatabaseInfo.isACMDatabaseFolder(ent.fileName())) {
           ACMDatabaseInfo dbInfo = new ACMDatabaseInfo(ent.fileName());
-          String tbLoadersPath = ent.path + "/TB-Loaders";
           Entry tbloaderDir = null;
           try {
-            tbloaderDir = mApi.metadata(tbLoadersPath, 1000, null, true, null);
+            tbloaderDir = mApi.metadata(dbInfo.getTBLoadersDropBoxPath(), 1000, null, true, null);
           } catch (DropboxException e) {
             // skip this folder
           }
@@ -178,13 +198,14 @@ public class IOHandler {
               if (file.fileName().endsWith(".rev")) {
                 Log.d("Dropbox", "Found " + file.fileName());
                 String imageName = file.fileName().substring(0, file.fileName().length() - 4);
-                String zipFilePath = tbloaderDir.path + "/content-" + imageName + ".zip";
+                String zipFilePath = tbloaderDir.path + ACMDatabaseInfo.DeploymentPackage.getZipFileName(imageName);
                 try {
                   Entry zipFile = mApi.metadata(zipFilePath, 1000, null, true, null);
                   if (zipFile != null) {
-                    ACMDatabaseInfo.DeviceImage deviceImage =
-                        new ACMDatabaseInfo.DeviceImage(dbInfo, imageName, zipFile.path, zipFile.bytes);
-                    File localZipFile = new File(getLocalDownloadPath(deviceImage), zipFile.fileName());
+                    ACMDatabaseInfo.DeploymentPackage deviceImage =
+                        new ACMDatabaseInfo.DeploymentPackage(dbInfo, imageName, zipFile.bytes,
+                            getLocalDownloadPath(dbInfo.getName(), imageName));
+                    File localZipFile = deviceImage.getLocalZipFile();
                     if (localZipFile.exists()) {
                       if (getSuccessFile(localZipFile).exists()) {
                         deviceImage.setStatus(Status.Downloaded);
@@ -211,7 +232,6 @@ public class IOHandler {
     } catch (DropboxException e) {
       Log.d("Dropbox", "Failed to load DBs from Dropbox.", e);
     }
-
 
     refreshLocal();
   }

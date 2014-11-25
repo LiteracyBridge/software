@@ -22,10 +22,10 @@ import android.widget.Toast;
 public class LibraryFragment extends Fragment {
 
   // final static String QUESTION = null;
-  ListView listView;
-  TextView txtView;
-  Button resetButton;
-  int questionNr;
+  private ListView listView;
+  private TextView txtView;
+  private Button resetButton;
+  private int questionNr;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,34 +52,17 @@ public class LibraryFragment extends Fragment {
       // Start with the first question
       questionNr = 0;
 
-    Log.d("bruno", "Question number was set to:" + questionNr);
-
     // Get button from XML for question
     resetButton = (Button) rootView.findViewById(R.id.libButton);
     resetButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        downloadController.reset();
-
-        // Instantiate new fragment
-        LibraryFragment libFrag = new LibraryFragment();
-
-        // Pass current question number to new fragment
-        final Bundle args = new Bundle();
-        args.putInt("questionNumber", 0);
-        libFrag.setArguments(args);
-
-        Log.d("bruno", "Passing argument to new fragment:" + args.toString());
-
-        // Switch to new fragment
-        FragmentTransaction transaction = getActivity()
-            .getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, libFrag);
-        transaction.addToBackStack(null);
-        transaction.commit();
-
+        reset();
       }
     });
 
+    if (questionNr == 0) {
+      downloadController.reset();
+    }
     // Get answers for first question
 
     MultipleChoiceQuestion question = downloadController
@@ -114,7 +97,7 @@ public class LibraryFragment extends Fragment {
           // TODO: Initialize copying...
 
           Toast.makeText(getActivity().getApplicationContext(),
-              "Reached final question", 1).show();
+              "Reached final question", Toast.LENGTH_LONG).show();
 
         } else {
 
@@ -141,7 +124,25 @@ public class LibraryFragment extends Fragment {
     });
 
     return rootView;
+  }
 
+  public void reset() {
+    DownloadController.getInstance().reset();
+
+    // Instantiate new fragment
+    LibraryFragment libFrag = new LibraryFragment();
+
+    // Pass current question number to new fragment
+    final Bundle args = new Bundle();
+    args.putInt("questionNumber", 0);
+    libFrag.setArguments(args);
+
+    // Switch to new fragment
+    FragmentTransaction transaction = getActivity()
+        .getSupportFragmentManager().beginTransaction();
+    transaction.replace(R.id.fragment_container, libFrag);
+    transaction.addToBackStack(null);
+    transaction.commit();
   }
 
 }

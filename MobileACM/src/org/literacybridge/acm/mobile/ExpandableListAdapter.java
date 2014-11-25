@@ -41,7 +41,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
   public View getChildView(int groupPosition, final int childPosition,
       boolean isLastChild, View convertView, ViewGroup parent) {
 
-    final ACMDatabaseInfo.DeviceImage child = (ACMDatabaseInfo.DeviceImage) getChild(
+    final ACMDatabaseInfo.DeploymentPackage child = (ACMDatabaseInfo.DeploymentPackage) getChild(
         groupPosition, childPosition);
 
     final String imageName = child.getName();

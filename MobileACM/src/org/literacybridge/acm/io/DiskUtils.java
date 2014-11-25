@@ -1,19 +1,27 @@
 package org.literacybridge.acm.io;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
 
 public class DiskUtils {
+  private static final int BUFFER_SIZE = 2048;
+
   private static void copy(List<Pair<File, File>> filesToCopy)
       throws IOException {
     for (Pair<File, File> file : filesToCopy) {
@@ -44,6 +52,33 @@ public class DiskUtils {
 
       runAsRoot("cp " + from.getAbsolutePath() + " " + to.getAbsolutePath());
     }
+  }
+
+  public static void unzip(File zipFile) throws IOException {
+    BufferedOutputStream dest = null;
+    FileInputStream fis = new FileInputStream(zipFile);
+    ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
+    ZipEntry entry;
+    while ((entry = zis.getNextEntry()) != null) {
+      File target = new File(zipFile.getParent(), entry.getName());
+      if (entry.isDirectory()) {
+        Log.d("unzip", "mkdir " + entry);
+        target.mkdirs();
+      } else {
+        Log.d("unzip", "extracting " + entry);
+        int count;
+        byte data[] = new byte[BUFFER_SIZE];
+        // write the files to the disk
+        FileOutputStream fos = new FileOutputStream(target);
+        dest = new BufferedOutputStream(fos, BUFFER_SIZE);
+        while ((count = zis.read(data, 0, BUFFER_SIZE)) != -1) {
+          dest.write(data, 0, count);
+        }
+        dest.flush();
+        dest.close();
+      }
+    }
+    zis.close();
   }
 
   public static void formatDevice(Context context, TalkingBookDevice device) throws IOException {

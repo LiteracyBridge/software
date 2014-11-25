@@ -14,7 +14,7 @@ import com.google.analytics.tracking.android.Tracker;
 public class QAFragment extends Fragment {
 
 	private Tracker tracker;
-	
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
@@ -43,13 +43,13 @@ public class QAFragment extends Fragment {
 
       // Report analytics
       this.tracker = EasyTracker.getInstance(getActivity());
-      
+
     }
-    
+
     return rootView;
 
   }
-  
+
   @Override
   public void onResume() {
 

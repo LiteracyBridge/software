@@ -142,7 +142,7 @@ public class OnlineFragment extends Fragment {
         public boolean onChildClick(ExpandableListView parent, View v,
             int groupPosition, int childPosition, long id) {
 
-          final ACMDatabaseInfo.DeviceImage image = result.get(groupPosition)
+          final ACMDatabaseInfo.DeploymentPackage image = result.get(groupPosition)
               .getDeviceImages().get(childPosition);
           new Thread(new Runnable() {
             @Override public void run() {

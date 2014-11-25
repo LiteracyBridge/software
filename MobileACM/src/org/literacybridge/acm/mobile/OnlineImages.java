@@ -18,7 +18,7 @@ public class OnlineImages extends FragmentActivity implements
 
   /*
    * List<ACMDatabaseInfo> deviceList;
-   * 
+   *
    * ExpandableListAdapter listAdapter; ExpandableListView expListView;
    * List<String> listDataHeader; HashMap<String, List<String>> listDataChild;
    */
@@ -86,7 +86,6 @@ public class OnlineImages extends FragmentActivity implements
   @Override
   public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
     viewPager.setCurrentItem(arg0.getPosition());
-
   }
 
   @Override
@@ -94,7 +93,7 @@ public class OnlineImages extends FragmentActivity implements
     // TODO Auto-generated method stub
 
   }
-  
+
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
@@ -102,17 +101,17 @@ public class OnlineImages extends FragmentActivity implements
     case R.id.action_sync:
       Toast.makeText(this, "Sync selected", Toast.LENGTH_SHORT)
           .show();
-      
+
       // Recreate OnlineImages activity
       this.recreate();
-      
+
       break;
-      
+
     case R.id.action_debug:
     	Intent myIntent = new Intent(this, DebugActivity.class);
     	this.startActivity(myIntent);
     	break;
-      
+
     // action with ID action_settings was selected
     case R.id.action_settings:
       Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT)
@@ -123,6 +122,6 @@ public class OnlineImages extends FragmentActivity implements
     }
 
     return true;
-  } 
+  }
 
 }

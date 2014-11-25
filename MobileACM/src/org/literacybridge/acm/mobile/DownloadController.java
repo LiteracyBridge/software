@@ -3,6 +3,10 @@ package org.literacybridge.acm.mobile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.literacybridge.acm.mobile.ACMDatabaseInfo.DeploymentPackage;
+
+import android.util.Log;
+
 public class DownloadController {
   private static volatile DownloadController singleton;
 
@@ -75,8 +79,6 @@ public class DownloadController {
 
   private DownloadController() {
     this.questions = new ArrayList<DownloadController.MultipleChoiceQuestion>();
-    // only temporary until this is hooked up to the dropbox API
-    createSampleData(-1);
   }
 
   private List<MultipleChoiceQuestion> questions;
@@ -90,6 +92,7 @@ public class DownloadController {
   }
 
   public void reset() {
+    createData(-1);
     for (MultipleChoiceQuestion question : questions) {
       question.reset();
     }
@@ -102,59 +105,80 @@ public class DownloadController {
 
   private void maybeUpdateQuestions(int questionIndex) {
     // only temporary until this is hooked up to the dropbox API
-    createSampleData(questionIndex);
+    createData(questionIndex);
   }
 
   // only temporary until this is hooked up to the dropbox API
-  private void createSampleData(int questionIndex) {
+  private void createData(int questionIndex) {
     if (questionIndex == -1) {
+      questions.clear();
       questions.add(new MultipleChoiceQuestion("", new ArrayList<String>()));
       questions.add(new MultipleChoiceQuestion("", new ArrayList<String>()));
       questions.add(new MultipleChoiceQuestion("", new ArrayList<String>()));
     }
 
-    if (questionIndex < 0) {
+    IOHandler handler = IOHandler.getInstance();
+    if (handler == null) {
+      return;
+    }
+    List<ACMDatabaseInfo> dbs = handler.getDatabaseInfos();
+
+    if (questionIndex == -1) {
       List<String> answers = new ArrayList<String>();
-      answers.add("ALL");
-      answers.add("Duori");
-      answers.add("Hain");
-      answers.add("Jirapa");
-      answers.add("Sabuli");
-      answers.add("Tuggo");
-      answers.add("Ullo");
-      answers.add("Wa-Municipal");
-      answers.add("Yagha");
-      questions.set(0, new MultipleChoiceQuestion("Please select district",
+      for (ACMDatabaseInfo db : dbs) {
+        answers.add(db.getName());
+      }
+      questions.set(0, new MultipleChoiceQuestion("Please select ACM",
           answers));
     }
 
-    if (questionIndex < 1) {
-      boolean all = true;
 
-      if (questions.get(0).isAnswered()) {
-        if (questions.get(0).getSelectedAnswerIndex() != 0) {
-          all = false;
+    switch (questionIndex) {
+      case 0 :
+        int dbIndex = -1;
+
+        if (questions.get(0).isAnswered()) {
+          dbIndex = questions.get(0).getSelectedAnswerIndex();
         }
-      }
 
-      List<String> answers = new ArrayList<String>();
-      answers.add("Village 1");
-      answers.add("Village 2");
-      answers.add("Village 3");
-      if (all) {
-        answers.add("Village 4");
-        answers.add("Village 5");
-      }
+        Log.d("QUESTIONS", "dbIndex = " + dbIndex);
 
-      questions.set(1, new MultipleChoiceQuestion("Please select village",
-          answers));
-    }
+        if (dbIndex != -1) {
+          List<String> answers = new ArrayList<String>();
+          List<DeploymentPackage> packages = dbs.get(dbIndex).getDeviceImages();
+          Log.d("QUESTIONS", "packages = " + packages);
+          for (DeploymentPackage p : packages) {
+            answers.add(p.getName());
+          }
 
-    if (questionIndex < 2) {
-      List<String> answers = new ArrayList<String>();
-      answers.add("Default");
-      questions.set(2, new MultipleChoiceQuestion("Please select image",
-          answers));
+          questions.set(1, new MultipleChoiceQuestion("Please select deployment package",
+              answers));
+        }
+        break;
+      case 1 :
+        dbIndex = -1;
+        int packageIndex = -1;
+
+        if (questions.get(0).isAnswered()) {
+          dbIndex = questions.get(0).getSelectedAnswerIndex();
+        }
+
+        if (questions.get(1).isAnswered()) {
+          packageIndex = questions.get(1).getSelectedAnswerIndex();
+        }
+
+        Log.d("QUESTIONS", "dbIndex = " + dbIndex);
+        Log.d("QUESTIONS", "packageIndex = " + packageIndex);
+
+        if (dbIndex != -1 && packageIndex != -1) {
+          List<String> answers = new ArrayList<String>();
+          Log.d("QUESTIONS", "packages = " + dbs.get(dbIndex).getDeviceImages());
+          answers.addAll(dbs.get(dbIndex).getDeviceImages().get(packageIndex).getCommunities());
+
+          questions.set(2, new MultipleChoiceQuestion("Please select village",
+              answers));
+        }
+        break;
     }
   }
 }
