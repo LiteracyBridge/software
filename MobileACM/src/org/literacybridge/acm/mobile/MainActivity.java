@@ -1,6 +1,8 @@
 package org.literacybridge.acm.mobile;
 
 import java.util.HashMap;
+
+
 import java.util.List;
 
 import org.literacybridge.acm.mobile.dropbox.DropboxClient;
@@ -37,25 +39,9 @@ public class MainActivity extends Activity {
     setContentView(R.layout.activity_main);
     
     easyTracker = EasyTracker.getInstance(MainActivity.this);
-    /*
-    easyTracker.send(MapBuilder.createEvent("your_action",
-			"envet_name", "button_name/id", null).build());
+   
     
-    // get the listview
-    // expListView = (ExpandableListView) findViewById(R.id.lvExp);
-
-    /*
-     * listDataHeader = new ArrayList<String>();
-     * listDataHeader.addAll(listDataChild.keySet());
-     * 
-     * 
-     * listAdapter = new ExpandableListAdapter(this, listDataHeader,
-     * listDataChild);
-     */
-
-    // setting list adapter
-    // expListView.setAdapter(listAdapter);
-
+    
   }
 
   

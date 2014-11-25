@@ -101,7 +101,6 @@ public class OnlineImages extends FragmentActivity implements
     case R.id.action_sync:
       Toast.makeText(this, "Sync selected", Toast.LENGTH_SHORT)
           .show();
-
       // Recreate OnlineImages activity
       this.recreate();
 
