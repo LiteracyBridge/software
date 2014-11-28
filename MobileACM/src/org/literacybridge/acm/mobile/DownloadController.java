@@ -39,6 +39,8 @@ public class DownloadController {
     }
 
     public List<String> getAnswers() {
+    	Log.d("DownloadController", "Questions:" + question);
+    	Log.d("DownloadController", "Number of answers:" + Integer.toString(answers.size()));
       return answers;
     }
 

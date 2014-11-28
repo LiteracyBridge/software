@@ -4,7 +4,17 @@ import java.util.List;
 
 import org.literacybridge.acm.mobile.DownloadController.MultipleChoiceQuestion;
 
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.Tracker;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -27,12 +37,28 @@ public class LibraryFragment extends Fragment {
   private Button resetButton;
   private int questionNr;
 
+  private DownloadController downloadController;
+ 
+  
+  public class FragmentReceiver1 extends BroadcastReceiver {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+    	 
+    	  // Set answers
+    	  reloadData();
+      }    
+}
+
+  
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
 
     View rootView = inflater.inflate(R.layout.fragment_library, container,
         false);
+    
+    // Register receiver to get notified about tab clicks
+    getActivity().registerReceiver(new FragmentReceiver1(), new IntentFilter("librarytabclicked"));
 
     // Get listView from XML for answers
     listView = (ListView) rootView.findViewById(R.id.libListView);
@@ -40,9 +66,9 @@ public class LibraryFragment extends Fragment {
     // Get textView from XML for question
     txtView = (TextView) rootView.findViewById(R.id.libTextView);
 
+    
     // Instantiate downloadController singleton
-    final DownloadController downloadController = DownloadController
-        .getInstance();
+     downloadController = DownloadController.getInstance();
 
     // determine questions nr
     Bundle args = getArguments();
@@ -62,21 +88,13 @@ public class LibraryFragment extends Fragment {
 
     if (questionNr == 0) {
       downloadController.reset();
+     this.setData(questionNr);
+    
     }
-    // Get answers for first question
+    
+  
 
-    MultipleChoiceQuestion question = downloadController
-        .getQuestion(questionNr);
-    final List<String> answerList = question.getAnswers();
-    txtView.setText(question.getQuestion());
-
-    String[] array = answerList.toArray(new String[answerList.size()]);
-
-    ArrayAdapter<String> answerAdapter = new ArrayAdapter<String>(
-        this.getActivity(), R.layout.simple_list_item, R.id.label, array);
-
-    listView.setAdapter(answerAdapter);
-
+    
     // Create onItemClickListener for listview
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
@@ -101,48 +119,52 @@ public class LibraryFragment extends Fragment {
 
         } else {
 
-          // Instantiate new fragment
-          LibraryFragment libFrag = new LibraryFragment();
-
-          // Pass current question number to new fragment
-          final Bundle args = new Bundle();
-          args.putInt("questionNumber", questionNr + 1);
-          libFrag.setArguments(args);
-
-          Log.d("bruno", "Passing argument to new fragment:" + args.toString());
-
-          // Switch to new fragment
-          FragmentTransaction transaction = getActivity()
-              .getSupportFragmentManager().beginTransaction();
-          transaction.replace(R.id.fragment_container, libFrag);
-          transaction.addToBackStack(null);
-          transaction.commit();
+        	
+        	questionNr = questionNr + 1;
+        	setData(questionNr);
+        	
 
         }
 
       }
     });
 
+ 
     return rootView;
   }
+  
+  private void setData(int questionsNr) {
+	  // Get answers for first question
+	    MultipleChoiceQuestion question = downloadController.getQuestion(questionsNr);
+	    
+	    txtView.setText(question.getQuestion());
+	    
+	    List<String> answerList = question.getAnswers();    
+	    String[] array = answerList.toArray(new String[answerList.size()]);
+	    
+	    Log.d("LibraryFragment", "Number of answers:" + Integer.toString(array.length));
+	    
+	    ArrayAdapter<String> answerAdapter = new ArrayAdapter<String>(
+	        this.getActivity(), R.layout.simple_list_item, R.id.label, array);
 
+	    listView.setAdapter(answerAdapter);
+  }
+ 
   public void reset() {
+	  
     DownloadController.getInstance().reset();
-
-    // Instantiate new fragment
-    LibraryFragment libFrag = new LibraryFragment();
-
-    // Pass current question number to new fragment
-    final Bundle args = new Bundle();
-    args.putInt("questionNumber", 0);
-    libFrag.setArguments(args);
-
-    // Switch to new fragment
-    FragmentTransaction transaction = getActivity()
-        .getSupportFragmentManager().beginTransaction();
-    transaction.replace(R.id.fragment_container, libFrag);
-    transaction.addToBackStack(null);
-    transaction.commit();
+    questionNr = 0;
+    this.setData(questionNr);
+    
   }
 
+  private void reloadData() {
+	  MultipleChoiceQuestion question = downloadController.getQuestion(questionNr);
+	   if (question.getAnswers().size() == 0) {
+		   reset();
+	   }
+  }
+
+  
+  
 }

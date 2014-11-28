@@ -2,6 +2,7 @@ package org.literacybridge.acm.mobile;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,8 @@ import com.google.analytics.tracking.android.Tracker;
 
 public class QAFragment extends Fragment {
 
-	private Tracker tracker;
+	  private Tracker tracker;
+	  private LibraryFragment firstFragment;
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -30,34 +32,46 @@ public class QAFragment extends Fragment {
         return null;
       }
 
+
       // Create a new Fragment to be placed in the activity layout
-      LibraryFragment firstFragment = new LibraryFragment();
+      firstFragment = new LibraryFragment();
 
-      // In case this activity was started with special instructions from an
-      // Intent, pass the Intent's extras to the fragment as arguments
-      firstFragment.setArguments(getActivity().getIntent().getExtras());
-
+      // Pass first question to fragment in order to get answer list when first showing the fragment
+      final Bundle args = new Bundle();
+      args.putInt("questionNumber", 0);
+      firstFragment.setArguments(args);
+      
       // Add the fragment to the 'fragment_container' FrameLayout
       getActivity().getSupportFragmentManager().beginTransaction()
           .add(R.id.fragment_container, firstFragment).commit();
 
-      // Report analytics
-      this.tracker = EasyTracker.getInstance(getActivity());
-
+      
+      
     }
+
+    
+    // Report analytics
+    this.tracker = EasyTracker.getInstance(getActivity());
+    
 
     return rootView;
 
+  }
+  
+  public void resetData() {
+	  
+	  // Reset answers
+      firstFragment.reset();
   }
 
   @Override
   public void onResume() {
 
       super.onResume();
-
-      //this.tracker.set(Fields.SCREEN_NAME, getClass().getSimpleName());
+      
       this.tracker.set(Fields.SCREEN_NAME, "Library_Screen");
       this.tracker.send( MapBuilder.createAppView().build() );
+      
   }
 
 }

@@ -57,6 +57,7 @@ public class OnlineImages extends FragmentActivity implements
         // on changing the page
         // make respected tab selected
         actionBar.setSelectedNavigationItem(position);
+        
       }
 
       @Override
@@ -86,6 +87,15 @@ public class OnlineImages extends FragmentActivity implements
   @Override
   public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
     viewPager.setCurrentItem(arg0.getPosition());
+    
+ // Notify library fragment about click
+    if (arg0.getPosition() == 1) {
+    	// Notify library fragment about click
+    	Intent data = new Intent("librarytabclicked");
+    	//data.putInt("fragmentno",1); // Pass the unique id of fragment we talked abt earlier
+    	this.sendBroadcast(data);
+    }
+    	
   }
 
   @Override
