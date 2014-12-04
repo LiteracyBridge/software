@@ -2,16 +2,14 @@ package org.literacybridge.acm.io;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -32,7 +30,7 @@ public class DiskUtils {
   public static void copy(File from, File to) throws IOException {
     if (from.isDirectory()) {
       if (!to.exists()) {
-        runAsRoot("mkdir -p " + to.getAbsolutePath());
+        Sudo.sudo("mkdir -p " + to.getAbsolutePath());
       }
 
       File[] subFiles = from.listFiles();
@@ -47,10 +45,10 @@ public class DiskUtils {
           return;
         }
 
-        runAsRoot("rm " + to.getAbsolutePath());
+        Sudo.sudo("rm " + to.getAbsolutePath());
       }
 
-      runAsRoot("cp " + from.getAbsolutePath() + " " + to.getAbsolutePath());
+      Sudo.sudo("cp " + from.getAbsolutePath() + " " + to.getAbsolutePath());
     }
   }
 
@@ -83,7 +81,7 @@ public class DiskUtils {
 
   public static void formatDevice(Context context, TalkingBookDevice device) throws IOException {
     device.unmount();
-    runAsRoot("/system/xbin/mkfs.vfat -v " + device.getDeviceDir());
+    Sudo.sudo("/system/xbin/mkfs.vfat -v " + device.getDeviceDir());
     device.mount(context);
 
   }
@@ -114,10 +112,13 @@ public class DiskUtils {
         return mountPoint;
       }
     } else {
-      mountPoint.mkdirs();
+      boolean success = mountPoint.mkdirs();
     }
 
-    if (runAsRoot("mount -t vfat -o rw -o nosuid " + devicePath.getAbsolutePath() + " " + mountPoint.getAbsolutePath())) {
+    Sudo.Output output = Sudo.sudo("mount -t vfat -o rw -o nosuid "
+        + devicePath.getAbsolutePath() + " " + mountPoint.getAbsolutePath());
+
+    if (output.returnCode == 0) {
       // mount return code 0 - assume we successfully mounted this device if mountPoint exists
       if (mountPoint.exists()) {
         return mountPoint;
@@ -132,39 +133,26 @@ public class DiskUtils {
     if (repair == true){
       repairParam = "y";
     }
-    return runAsRoot("/system/bin/fsck_msdos -" + repairParam + " " + dir);
+    return Sudo.sudo("/system/bin/fsck_msdos -" + repairParam + " " + dir).returnCode == 0;
   }
 
   public static void unmount(File mountPoint) throws IOException {
-    runAsRoot("/system/bin/umount " + mountPoint.getAbsolutePath());
+    Sudo.sudo("/system/bin/umount " + mountPoint.getAbsolutePath());
   }
 
-  public static boolean runAsRoot(String... cmds) throws IOException {
-    Process p = Runtime.getRuntime().exec("su");
-    DataOutputStream os = new DataOutputStream(p.getOutputStream());
-    for (String tmpCmd : cmds) {
-      Log.d("ROOT", tmpCmd);
-      os.writeBytes(tmpCmd + "\n");
-    }
-    os.writeBytes("exit\n");
-    os.flush();
-    try {
-      return p.waitFor() == 0;
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new IOException(e);
-    }
-  }
+  public static String getLabel(File device) throws IOException {
+    String output = Sudo.sudo("blkid").stdout;
+    String[] lines = output.split("\n");
 
-  static void consumeProcessOutput(Process proc, boolean listenToStdErr)
-      throws IOException {
-    InputStream stderr = listenToStdErr ? proc.getErrorStream() : proc
-        .getInputStream();
-    InputStreamReader isr = new InputStreamReader(stderr);
-    BufferedReader br = new BufferedReader(isr);
-    String line = null;
+    for (String line : lines) {
+      String pattern = "^" + device.getAbsolutePath() + ": LABEL=\"([^\"]*)\".*";
+      Matcher matcher = Pattern.compile(pattern).matcher(line);
 
-    while ((line = br.readLine()) != null)
-      ;
+      if (matcher.matches()) {
+        return matcher.group(1);
+      }
+    }
+
+    return null;
   }
 }

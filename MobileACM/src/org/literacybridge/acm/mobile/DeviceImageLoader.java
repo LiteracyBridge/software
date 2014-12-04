@@ -3,11 +3,7 @@ package org.literacybridge.acm.mobile;
 import java.io.File;
 import java.io.IOException;
 
-import org.literacybridge.acm.io.DiskUtils;
-import org.literacybridge.acm.io.TalkingBookDevice;
-
 import android.content.Context;
-import android.util.Log;
 
 public class DeviceImageLoader {
   private static volatile DeviceImageLoader singleton;
@@ -27,7 +23,7 @@ public class DeviceImageLoader {
     // copyStatsFromDevice();
     // DiskUtils.checkDisk();
     //DiskUtils.formatDevice();
-    
+
     return Result.SUCCESS;
   }
 
@@ -55,9 +51,9 @@ public class DeviceImageLoader {
 //      throw new IOException("The device appears to be corrupted.");
 //    }
 
-    TalkingBookDevice device = TalkingBookDevice.getConnectedDevice(context);
-    Log.d("HMPF", source + " -> " + device.getRootDir());
-    DiskUtils.copy(source, device.getRootDir());
+    //TalkingBookDevice device = TalkingBookDevice.getConnectedDevice(context, null);
+    //Log.d("HMPF", source + " -> " + device.getRootDir());
+    //DiskUtils.copy(source, device.getRootDir());
 
     // File deviceRoot = new File("/storage/UsbDriveA");
     // File test = new File(deviceRoot, "test.txt");

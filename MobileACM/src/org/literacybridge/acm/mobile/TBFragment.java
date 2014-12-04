@@ -1,7 +1,12 @@
 package org.literacybridge.acm.mobile;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
+import org.literacybridge.acm.io.DiskUtils;
+import org.literacybridge.acm.io.MountService;
+import org.literacybridge.acm.io.Sudo;
 import org.literacybridge.acm.io.TalkingBookDevice;
 
 import android.os.Bundle;
@@ -41,15 +46,21 @@ public class TBFragment extends Fragment {
     mountButton = (Button) rootView.findViewById(R.id.btnMount);
     mountButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        mountedDevice = TalkingBookDevice.getConnectedDevice(v.getContext());
-        if (mountedDevice != null) {
-          String msg = "Mounted TB device " + mountedDevice.getDeviceDir() + " at " + mountedDevice.getRootDir();
-          Log.d("DEBUG", msg);
-          Toast.makeText(v.getContext(), msg, Toast.LENGTH_LONG).show();
-          status.setText("Connection status: TalkingBook mounted: " + mountedDevice.getDeviceDir());
-        } else {
-          Toast.makeText(v.getContext(), "No TalkingBook connected", Toast.LENGTH_LONG).show();
-        }
+//        Toast.makeText(v.getContext(), "Connected devices: " + MountService.connectedDevices, Toast.LENGTH_SHORT).show();
+//        List<File> tbs = MountService.connectedDevices;
+//
+//        if (tbs != null && !tbs.isEmpty()) {
+//          try {
+//            File device = tbs.get(0);
+//            String label = DiskUtils.getLabel(device);
+//            File mntPoint = DiskUtils.mountUSBDisk(v.getContext(), device);
+//            Toast.makeText(v.getContext(), "Mounted '" + label + "' at " + mntPoint, Toast.LENGTH_LONG).show();
+//            Sudo.sudo("echo '" + System.currentTimeMillis() + "' >> " + mntPoint.getAbsolutePath() + "/mtbl.test");
+//            Toast.makeText(v.getContext(), Sudo.cat(new File(mntPoint, "mtbl.test")), Toast.LENGTH_LONG).show();
+//          } catch (IOException e) {
+//            Toast.makeText(v.getContext(), "Exception while mounting " + e, Toast.LENGTH_LONG).show();
+//          }
+//        }
       }
     });
 
