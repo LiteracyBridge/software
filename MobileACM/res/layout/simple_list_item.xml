@@ -3,6 +3,8 @@
     android:id="@+id/label"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:textSize="20sp" >
+    android:textSize="20sp" 
+    android:background="#dff5fc"
+    android:padding="20dp">
 
 </TextView>

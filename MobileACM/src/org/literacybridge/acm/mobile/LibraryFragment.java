@@ -35,6 +35,7 @@ public class LibraryFragment extends Fragment {
   private ListView listView;
   private TextView txtView;
   private Button resetButton;
+  private Button backButton;
   private int questionNr;
 
   private DownloadController downloadController;
@@ -78,8 +79,18 @@ public class LibraryFragment extends Fragment {
       // Start with the first question
       questionNr = 0;
 
-    // Get button from XML for question
-    resetButton = (Button) rootView.findViewById(R.id.libButton);
+    // Set up Back button
+    backButton = (Button) rootView.findViewById(R.id.libBack);
+    backButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+    	  back();
+      }
+
+    });
+
+    
+    // Set up Reset button
+    resetButton = (Button) rootView.findViewById(R.id.libReset);
     resetButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         reset();
@@ -113,10 +124,12 @@ public class LibraryFragment extends Fragment {
           // Reached latest question!
 
           // TODO: Initialize copying...
-
+        	
+        /*
           Toast.makeText(getActivity().getApplicationContext(),
               "Reached final question", Toast.LENGTH_LONG).show();
-
+		*/
+        	
         } else {
 
         	
@@ -157,6 +170,15 @@ public class LibraryFragment extends Fragment {
     this.setData(questionNr);
     
   }
+  
+	private void back() {
+		
+		if (questionNr > 0) {
+			questionNr = questionNr - 1;
+			this.setData(questionNr);
+		}
+		
+	}
 
   private void reloadData() {
 	  MultipleChoiceQuestion question = downloadController.getQuestion(questionNr);

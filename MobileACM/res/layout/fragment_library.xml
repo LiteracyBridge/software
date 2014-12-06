@@ -1,44 +1,72 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffffff"
     android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/libButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:text="Reset" />
-
-    <ListView
-        android:id="@+id/libListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/libButton" >
-
-    </ListView>
-
     <TextView
         android:id="@+id/libTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/libButton"
-        android:layout_alignBottom="@+id/libButton"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="15dp"
+        android:layout_alignParentTop="true"
         android:text="Question"
-        android:textSize="20sp" />
+        android:textSize="20sp" 
+        android:padding="20dp"
+        android:textStyle="bold" />
+    
+    <ListView
+        android:id="@+id/libListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/libButtonLayout"
+        android:layout_below="@+id/libTextView"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="false" />
 
+    <!--  
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/libTextView"
-        android:layout_toLeftOf="@+id/libButton" >
+        android:layout_alignBottom="@+id/libButton" >
     </FrameLayout>
+	-->
 
+	<LinearLayout
+        android:id="@+id/libButtonLayout"
+        android:orientation="horizontal"
+
+        android:paddingLeft="4.0dip"
+        android:paddingTop="5.0dip"
+        android:paddingRight="4.0dip"
+        android:paddingBottom="1.0dip"
+        android:layout_alignParentBottom="true"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
+        >
+
+        <Button
+            android:id="@+id/libBack"
+            android:layout_width="0.0dip" android:layout_height="fill_parent"
+            android:text="Back"
+            android:layout_weight="1.0" />
+
+        <Button
+            android:id="@+id/libReset"
+            android:layout_width="0.0dip" android:layout_height="fill_parent"
+            android:text="Reset"
+            android:layout_weight="1.0" />
+
+    </LinearLayout>
+
+<!-- 
+    <Button
+        android:id="@+id/libButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Reset" />
+ -->
 </RelativeLayout>
