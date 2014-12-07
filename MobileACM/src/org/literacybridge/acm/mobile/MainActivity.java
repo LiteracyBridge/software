@@ -32,10 +32,13 @@ public class MainActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Log.d("michael", "start");
+    
+    /*
     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
         .permitAll().build();
     StrictMode.setThreadPolicy(policy);
     setContentView(R.layout.activity_main);
+	*/
 
     easyTracker = EasyTracker.getInstance(MainActivity.this);
 
