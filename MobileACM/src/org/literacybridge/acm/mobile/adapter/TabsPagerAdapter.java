@@ -1,8 +1,8 @@
 package org.literacybridge.acm.mobile.adapter;
 
 import org.literacybridge.acm.mobile.OnlineFragment;
-import org.literacybridge.acm.mobile.QAFragment;
 import org.literacybridge.acm.mobile.TBFragment;
+import org.literacybridge.acm.mobile.LibraryFragment;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,8 +22,8 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
       return new OnlineFragment();
     case 1:
       // Fragment retFrag = LibraryFragment.newInstance();
-      // return new LibraryFragment();
-      return new QAFragment();
+      return new LibraryFragment();
+      //return new QAFragment();
     case 2:
       return new TBFragment();
     }

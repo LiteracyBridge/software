@@ -37,6 +37,7 @@ public class LibraryFragment extends Fragment {
   private Button resetButton;
   private Button backButton;
   private int questionNr;
+  private Tracker tracker;
 
   private DownloadController downloadController;
  
@@ -142,7 +143,9 @@ public class LibraryFragment extends Fragment {
       }
     });
 
- 
+    // Report analytics
+    this.tracker = EasyTracker.getInstance(getActivity());
+    
     return rootView;
   }
   
@@ -187,6 +190,16 @@ public class LibraryFragment extends Fragment {
 	   }
   }
 
+
+  @Override
+  public void onResume() {
+
+      super.onResume();
+      
+      this.tracker.set(Fields.SCREEN_NAME, "Library_Screen");
+      this.tracker.send( MapBuilder.createAppView().build() );
+      
+  }
   
   
 }
